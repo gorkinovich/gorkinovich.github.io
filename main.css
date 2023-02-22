@@ -1,0 +1,403 @@
+/**********************************************************************/
+/* General                                                            */
+/**********************************************************************/
+
+/**
+ * Body style.
+ */
+body {
+  background-image: url("assets/brick.png");
+  color: #000000;
+  font-family: "Press Start 2P", "Courier New", monospace;
+  font-size: 16px; /* 12pt */
+  font-style: normal;
+  line-height: 24px; /* 18pt */
+  /* -webkit-font-smoothing: none; */
+}
+
+/**
+ * Header 1 style.
+ */
+h1 {
+  font-size: 40px; /* 30pt */
+  font-style: normal;
+  font-weight: normal;
+  text-align: center;
+}
+
+/**
+ * Header 2 style.
+ */
+h2 {
+  font-size: 32px; /* 24pt */
+  font-style: normal;
+  font-weight: normal;
+  text-align: center;
+  text-decoration: underline;
+}
+
+/**
+ * Header 3 style.
+ */
+h3 {
+  font-size: 24px; /* 18pt */
+  font-style: normal;
+  font-weight: normal;
+  text-align: center;
+  text-decoration: underline;
+}
+
+/**
+ * Unordered list style.
+ */
+ul {
+  /* display: table; */
+  /* list-style-position: outside; */
+  list-style-type: square;
+}
+
+/**
+ * List item style.
+ */
+li {
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+/**
+ * Table style.
+ */
+table {
+  border-collapse: collapse;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 2px;
+  margin-bottom: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 32px;
+}
+
+/**
+ * Table header style.
+ */
+th {
+  border-bottom-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  font-weight: normal;
+  padding: 8px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+/**
+ * Table data style.
+ */
+td {
+  padding: 8px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+/**
+ * Unvisited link style.
+ */
+a:link {
+  color: #5084AC;
+  text-decoration: none;
+}
+
+/**
+ * Visited link style.
+ */
+a:visited {
+  color: #5084AC;
+  text-decoration: none;
+}
+
+/**
+ * Mouse over link style.
+ */
+a:hover {
+  color: #509C80;
+  text-decoration: none;
+}
+
+/**
+ * Selected link style.
+ */
+a:active {
+  color: #C05858;
+  text-decoration: none;
+}
+
+/**********************************************************************/
+/* Text organization                                                  */
+/**********************************************************************/
+
+/**
+ * Text center style.
+ */
+.center {
+  text-align: center;
+}
+
+/**
+ * Text center style.
+ */
+.right {
+  text-align: right;
+}
+
+/**
+ * Left avatar box style.
+ */
+.leftavatar {
+  border-color: #000000;
+  border-style: solid;
+  border-width: 2px;
+  float: left;
+  margin-bottom: 16px;
+  margin-right: 16px;
+  margin-top: 16px;
+}
+
+/**
+ * List item indent style.
+ */
+.indenthuge {
+  list-style-position: inside;
+  margin-left: 198px;
+  text-indent: -198px;
+}
+
+/**
+ * List item indent style.
+ */
+.indentlarge {
+  list-style-position: inside;
+  margin-left: 120px;
+  text-indent: -120px;
+}
+
+/**
+ * Show pixel art box style.
+ */
+.showpixelart {
+  border-color: #000000;
+  border-style: solid;
+  border-width: 4px;
+  display: block;
+  margin-bottom: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 32px;
+}
+
+/**
+ * Show pixel art box style.
+ */
+.showscreenshot {
+  border-color: #000000;
+  border-style: solid;
+  border-width: 0px;
+  display: block;
+  margin-bottom: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 32px;
+}
+
+/**
+ * Body pixel art page style.
+ */
+.bodypixelart {
+  background-color: #ECECEC;
+  background-image: none;
+}
+
+/**********************************************************************/
+/* Cells organization                                                 */
+/**********************************************************************/
+
+/**
+ * Column style.
+ */
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 900px;
+}
+
+/**
+ * Column style.
+ */
+.column {
+  flex-basis: 50%;
+}
+
+/**
+ * Center block style.
+ */
+.centerblock {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/**********************************************************************/
+/* Main frames                                                        */
+/**********************************************************************/
+
+/**
+ * Div "header" style.
+ */
+.banner {
+  background-image: url("assets/header.png");
+  height: 192px;
+  margin-bottom: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 24px;
+  width: 800px;
+}
+
+/**
+ * Div "content" style.
+ */
+.content {
+  background-color: #ECECEC;
+  background-image: url("assets/border-center.png");
+  margin: auto;
+  padding: 16px 48px 16px 48px;
+  width: 904px;
+}
+
+/**
+ * Div "content" top border style.
+ */
+.content-top {
+  background-image: url("assets/border-top.png");
+  height: 24px;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  width: 1000px;
+}
+
+/**
+ * Div "content" top border style.
+ */
+.content-bottom {
+  background-image: url("assets/border-bottom.png");
+  height: 24px;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  width: 1000px;
+}
+
+/**********************************************************************/
+/* Button                                                             */
+/**********************************************************************/
+
+/**
+ * Button style.
+ */
+.button {
+  background-image: url("assets/button-normal.png");
+  color: #000000;
+  height: 96px;
+  line-height: 96px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  width: 336px;
+}
+
+/**
+ * Mouse over button style.
+ */
+.button:hover {
+  background-image: url("assets/button-hover.png");
+}
+
+/**
+ * Mouse pressed button style.
+ */
+.button:active {
+  background-image: url("assets/button-active.png");
+}
+
+/**********************************************************************/
+/* Centered button                                                    */
+/**********************************************************************/
+
+/**
+ * Button style.
+ */
+.cbutton {
+  background-image: url("assets/button-normal.png");
+  color: #000000;
+  height: 96px;
+  line-height: 96px;
+  margin-bottom: 8px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8px;
+  text-align: center;
+  text-decoration: none;
+  /* vertical-align: middle; */
+  width: 336px;
+}
+
+/**
+ * Mouse over button style.
+ */
+.cbutton:hover {
+  background-image: url("assets/button-hover.png");
+}
+
+/**
+ * Mouse pressed button style.
+ */
+.cbutton:active {
+  background-image: url("assets/button-active.png");
+}
+
+/**********************************************************************/
+/* Centered button                                                    */
+/**********************************************************************/
+
+/**
+ * Button style.
+ */
+.cbpixelart {
+  border-color: #5084AC;
+  border-style: solid;
+  border-width: 4px;
+  display: block;
+  margin-bottom: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 32px;
+  vertical-align: middle;
+}
+
+/**
+ * Mouse over button style.
+ */
+.cbpixelart:hover {
+  border-color: #509C80;
+}
+
+/**
+ * Mouse pressed button style.
+ */
+.cbpixelart:active {
+  border-color: #C05858;
+}

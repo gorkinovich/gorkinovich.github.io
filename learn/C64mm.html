@@ -1,0 +1,2270 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commodore 64: Mapa de memoria</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="text/javascript" src="util.js"></script>
+  <script>LoadTableOfContents([{url:'C64.html',name:'Commodore 64'},{url:'C64bas.html',name:'Lenguaje BASIC V2'}]);</script>
+
+  <meta name="author" content="Gorka Suárez García" lang="es">
+  <meta name="copyright" content="© 2021-2023 Gorka Suárez García" lang="es">
+  <meta name="description" content="Commodore 64: Mapa de memoria" lang="es">
+  <meta name="keywords" content="C64,commodore 64,programación,videojuegos,juegos,manuales" lang="es">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@gorkinovich">
+  <meta name="twitter:creator" content="@gorkinovich">
+  <meta name="twitter:title" content="Commodore 64: Mapa de memoria">
+  <meta name="twitter:description" content="Apuntes sobre el mapa de memoria del Commodore 64.">
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div id="TableOfContents" class="stackedit__toc">
+      
+<ul>
+<li><a href="#commodore-64-mapa-de-memoria">Commodore 64: Mapa de memoria</a>
+<ul>
+<li><a href="#página-cero">Página Cero</a></li>
+<li><a href="#pila-de-programa">Pila de programa</a></li>
+<li><a href="#gestión-de-entradasalida">Gestión de Entrada/Salida</a></li>
+<li><a href="#memoria-del-sistema">Memoria del Sistema</a></li>
+<li><a href="#buffer-de-pantalla-inicial">Buffer de pantalla inicial</a></li>
+<li><a href="#memoria-de-programas">Memoria de programas</a></li>
+<li><a href="#rom-de-las-fuentes-de-caracteres">ROM de las fuentes de caracteres</a></li>
+<li><a href="#chip-gráfico-vic-ii">Chip gráfico VIC-II</a></li>
+<li><a href="#chip-sonoro-sid">Chip sonoro SID</a></li>
+<li><a href="#buffer-de-color-de-pantalla">Buffer de color de pantalla</a></li>
+<li><a href="#cia1-entrada-datasette-irq">CIA1: Entrada, Datasette, IRQ</a></li>
+<li><a href="#cia2-puerto-serie-rs-232-nmi">CIA2: Puerto Serie, RS-232, NMI</a></li>
+<li><a href="#bloques-finales-de-memoria">Bloques finales de memoria</a></li>
+</ul>
+</li>
+<!-- <li><a href="C64.html">Commodore 64</a></li> -->
+<!-- <li><a href="C64bas.html">Lenguaje BASIC V2</a></li> -->
+<!-- <li><a href="index.html">Volver</a></li> -->
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="commodore-64-mapa-de-memoria">Commodore 64: Mapa de memoria</h1>
+<p>Este es un resumen y traducción parcial del siguiente <a href="https://sta.c64.org/cbm64mem.html">mapa de memoria</a> del Commodore 64. Para más información, en inglés, sobre los elementos en la memoria del C64 consulta la siguiente <a href="https://sta.c64.org/cbmdocs.html">documentación</a>.</p>
+<h2 id="página-cero">Página Cero</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">0</td>
+<td align="center">$0000</td>
+<td align="center">$2F (00101111)</td>
+<td>Configuración del registro de puertos de la CPU. <strong>Bits 0-7:</strong> <strong>0</strong> = Lectura; <strong>1</strong> = Escritura/Lectura.</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">$0001</td>
+<td align="center">$37 (00110111)</td>
+<td>Registro de puertos de la CPU:<br><strong>Bits 0-2:</strong> Configuración de los bloques de memoria en $A000-$BFFF, $D000-$DFFF y $E000-$FFFF.<br> + <strong>000;100</strong> = RAM visible en los tres bloques.<br> + <strong>x01</strong> = RAM visible en $A000-$BFFF y $E000-$FFFF.<br> + <strong>x10</strong> = RAM visible en $A000-$BFFF y KERNAL ROM visible en $E000-$FFFF.<br> + <strong>x11</strong> = BASIC ROM visible en $A000-$BFFF y KERNAL ROM visible en $E000-$FFFF.<br> + <strong>0xx</strong> = ROM de caracteres visible en $D000-$DFFF (excepto valor 000).<br> + <strong>1xx</strong> = Chips E/S visibles en $D000-$DFFF (excepto valor 100).<br><strong>Bit 3:</strong> Nivel de señal de salida del <em>datasette</em>.<br><strong>Bit 4:</strong> Estado de los botones del <em>datasette</em>: <strong>0</strong> = Uno o más botones pulsados; <strong>1</strong> = Ningún botón pulsado.<br><strong>Bit 5:</strong> Control del motor del <em>datasette</em>: <strong>0</strong> = Encendido; <strong>1</strong> = Apagado.</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">$0002</td>
+<td align="center">-</td>
+<td>Sin uso.</td>
+</tr>
+<tr>
+<td align="center">3-4</td>
+<td align="center">$0003-$0004</td>
+<td align="center">$B1AA</td>
+<td>Sin uso (dirección de la rutina de conversión de números flotantes a enteros).</td>
+</tr>
+<tr>
+<td align="center">5-6</td>
+<td align="center">$0005-$0006</td>
+<td align="center">$B391</td>
+<td>Sin uso (dirección de la rutina de conversión de números enteros a flotantes).</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="center">$0007</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>INPUT</code>, <code>AND</code>, <code>OR</code>, <code>INT</code>).</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">$0008</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<em>tokenizer</em>, <code>AND</code>, <code>OR</code>).</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="center">$0009</td>
+<td align="center">-</td>
+<td>Columna actual al usar <code>SPC</code> y <code>TAB</code>.</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="center">$000A</td>
+<td align="center">-</td>
+<td>Flag <code>LOAD</code>/<code>VERIFY</code> (<strong>$00</strong> = <code>LOAD</code>; <strong>$01</strong>-<strong>$FF</strong> = <code>VERIFY</code>).</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="center">$000B</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<em>tokenizer</em>, editor BASIC, flag <code>AND</code>/<code>OR</code>, dimensiones de un array).</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="center">$000C</td>
+<td align="center">-</td>
+<td>Flag para operaciones con arrays (<strong>$00</strong> = Fuera de un <code>DIM</code>; <strong>$40</strong>-<strong>$FF</strong> = Dentro de un <code>DIM</code>).</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="center">$000D</td>
+<td align="center">-</td>
+<td>Tipo de expresión (<strong>$00</strong> = Numérica; <strong>$FF</strong> = Cadena).</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="center">$000E</td>
+<td align="center">-</td>
+<td>Tipo de expresión numérica (<strong>Bit 7:</strong> <strong>0</strong> = Flotante; <strong>1</strong> = Entera).</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="center">$000F</td>
+<td align="center">-</td>
+<td>+ Modo de dobles comillas del <em>tokenizer</em> (<strong>Bit 6:</strong> <strong>0</strong> = Desactivado; <strong>1</strong> = Activado) o de <code>LIST</code> (<strong>$00</strong> = Desactivado; <strong>$FE</strong> = Activado).<br>+ Recolector de basura al reservar memoria para cadenas (<strong>$00</strong>-<strong>$7F</strong> = Recolección no realizada; <strong>$80</strong> = Recolección realizada).</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="center">$0010</td>
+<td align="center">-</td>
+<td>Flag durante la obtención del nombre de variable (<strong>$00</strong> = Se aceptan variables enteras; <strong>$01-$FF</strong> = No se aceptan variables enteras).</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td align="center">$0011</td>
+<td align="center">-</td>
+<td>Flag <code>GET</code>/<code>INPUT</code>/<code>READ</code> (<strong>$00</strong> = <code>GET</code>; <strong>$40</strong> = <code>INPUT</code>; <strong>$98</strong> = <code>READ</code>).</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td align="center">$0012</td>
+<td align="center">-</td>
+<td>Signo durante <code>SIN</code> y <code>TAN</code> (<strong>$00</strong> = Positivo; <strong>$FF</strong> = Negativo).</td>
+</tr>
+<tr>
+<td align="center">19</td>
+<td align="center">$0013</td>
+<td align="center">$00</td>
+<td>Número de dispositivo de E/S actual. (Por defecto el teclado para la entrada y la pantalla para la salida.)</td>
+</tr>
+<tr>
+<td align="center">20-21</td>
+<td align="center">$0014-$0015</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>GOSUB</code>, <code>GOTO</code>, <code>RUN</code>, <code>LIST</code>, <code>PEEK</code>, <code>POKE</code>, <code>SYS</code> y <code>WAIT</code>).</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="center">$0016</td>
+<td align="center">-</td>
+<td>Puntero a la siguiente expresión en la pila de cadenas.</td>
+</tr>
+<tr>
+<td align="center">23-24</td>
+<td align="center">$0017-$0018</td>
+<td align="center">-</td>
+<td>Puntero a la anterior expresión en la pila de cadenas.</td>
+</tr>
+<tr>
+<td align="center">25-33</td>
+<td align="center">$0019-$0021</td>
+<td align="center">-</td>
+<td>Área temporal para procesar expresiones de cadenas (9 bytes, 3 entradas).</td>
+</tr>
+<tr>
+<td align="center">34-37</td>
+<td align="center">$0022-$0025</td>
+<td align="center">-</td>
+<td>Área temporal para varias operaciones (4 bytes).</td>
+</tr>
+<tr>
+<td align="center">38-41</td>
+<td align="center">$0026-$0029</td>
+<td align="center">-</td>
+<td>Registro aritmético auxiliar para divisiones y multiplicaciones (4 bytes).</td>
+</tr>
+<tr>
+<td align="center">42</td>
+<td align="center">$002A</td>
+<td align="center">-</td>
+<td>Sin uso salvo para responder cuál es el sentido de la vida, el universo y todo lo demás.</td>
+</tr>
+<tr>
+<td align="center">43-44</td>
+<td align="center">$002B-$002C</td>
+<td align="center">$0801</td>
+<td>Puntero al inicio de la memoria de programas BASIC.</td>
+</tr>
+<tr>
+<td align="center">45-46</td>
+<td align="center">$002D-$002E</td>
+<td align="center">-</td>
+<td>Puntero al inicio del bloque de variables. (Final de programa +1.)</td>
+</tr>
+<tr>
+<td align="center">47-48</td>
+<td align="center">$002F-$0030</td>
+<td align="center">-</td>
+<td>Puntero al inicio del bloque de variables de arrays.</td>
+</tr>
+<tr>
+<td align="center">49-50</td>
+<td align="center">$0031-$0032</td>
+<td align="center">-</td>
+<td>Puntero al final del bloque de variables.</td>
+</tr>
+<tr>
+<td align="center">51-52</td>
+<td align="center">$0033-$0034</td>
+<td align="center">-</td>
+<td>Puntero al inicio del bloque de variables de cadenas. (Crece desde el final de la memoria de programas BASIC hacia abajo.)</td>
+</tr>
+<tr>
+<td align="center">53-54</td>
+<td align="center">$0035-$0036</td>
+<td align="center">-</td>
+<td>Puntero a la memoria reservada para la variable de cadena actual.</td>
+</tr>
+<tr>
+<td align="center">55-56</td>
+<td align="center">$0037-$0038</td>
+<td align="center">$A000</td>
+<td>Puntero al final de la memoria de programas BASIC.</td>
+</tr>
+<tr>
+<td align="center">57-58</td>
+<td align="center">$0039-$003A</td>
+<td align="center">-</td>
+<td>Línea actual de BASIC:<br>+ <strong>$0000-$F9FF</strong> (0-63999) = Número de línea.<br>+ <strong>$FF00-$FFFF</strong> = Modo directo, no se está ejecutando ningún programa BASIC.</td>
+</tr>
+<tr>
+<td align="center">59-60</td>
+<td align="center">$003B-$003C</td>
+<td align="center">-</td>
+<td>Línea actual de BASIC para <code>CONT</code>.</td>
+</tr>
+<tr>
+<td align="center">61-62</td>
+<td align="center">$003D-$003E</td>
+<td align="center">-</td>
+<td>Puntero a la siguiente instrucción BASIC para <code>CONT</code>:<br>+ <strong>$0000-$00FF</strong> = No es posible continuar.<br>+ <strong>$0100-$FFFF</strong> = Puntero a la siguiente instrucción.</td>
+</tr>
+<tr>
+<td align="center">63-64</td>
+<td align="center">$003F-$0040</td>
+<td align="center">-</td>
+<td>Línea actual de BASIC para el elemento actual de <code>DATA</code> para <code>READ</code>.</td>
+</tr>
+<tr>
+<td align="center">65-66</td>
+<td align="center">$0041-$0042</td>
+<td align="center">-</td>
+<td>Puntero al siguiente elemento <code>DATA</code> para <code>READ</code>.</td>
+</tr>
+<tr>
+<td align="center">67-68</td>
+<td align="center">$0043-$0044</td>
+<td align="center">-</td>
+<td>Puntero al resultado durante <code>GET</code>, <code>INPUT</code> y <code>READ</code>.</td>
+</tr>
+<tr>
+<td align="center">69-70</td>
+<td align="center">$0045-$0046</td>
+<td align="center">-</td>
+<td>Nombre y tipo de la variable actual:<br>+ <strong>Bits 0-6 de $0045:</strong> Primer carácter del nombre.<br>+ <strong>Bits 0-6 de $0046:</strong> Segundo carácter del nombre.<br>+ <strong>Bit 7 de $0045 y $0046:</strong> <strong>00</strong> = Flotante; <strong>01</strong> = Cadena; <strong>10</strong> = Función; <strong>11</strong> = Entera.</td>
+</tr>
+<tr>
+<td align="center">71-72</td>
+<td align="center">$0047-$0048</td>
+<td align="center">-</td>
+<td>Puntero al valor de la variable o función <code>FN</code> actual.</td>
+</tr>
+<tr>
+<td align="center">73-74</td>
+<td align="center">$0049-$004A</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>LET</code>, <code>WAIT</code>, <code>OPEN</code>, <code>CLOSE</code>, <code>LOAD</code>, <code>SAVE</code> y <code>VERIFY</code>).</td>
+</tr>
+<tr>
+<td align="center">75-76</td>
+<td align="center">$004B-$004C</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el puntero original a la instrucción BASIC actual durante <code>GET</code>, <code>INPUT</code> y <code>READ</code>.</td>
+</tr>
+<tr>
+<td align="center">77</td>
+<td align="center">$004D</td>
+<td align="center">-</td>
+<td>Indicador de operador de comparación:<br>+ <strong>Bit 1:</strong> <strong>1</strong> = <code>&gt;</code> se encuentra en la expresión.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = <code>=</code> se encuentra en la expresión.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = <code>&lt;</code> se encuentra en la expresión.</td>
+</tr>
+<tr>
+<td align="center">78-79</td>
+<td align="center">$004E-$004F</td>
+<td align="center">-</td>
+<td>Puntero a la función <code>FN</code> actual.</td>
+</tr>
+<tr>
+<td align="center">80-81</td>
+<td align="center">$0050-$0051</td>
+<td align="center">-</td>
+<td>Puntero a la variable de cadena actual durante la reserva de memoria.</td>
+</tr>
+<tr>
+<td align="center">82</td>
+<td align="center">$0052</td>
+<td align="center">-</td>
+<td>Sin uso.</td>
+</tr>
+<tr>
+<td align="center">83</td>
+<td align="center">$0053</td>
+<td align="center">-</td>
+<td>Tamaño del incremento en la recolección de basura.</td>
+</tr>
+<tr>
+<td align="center">84-86</td>
+<td align="center">$0054-$0056</td>
+<td align="center">-</td>
+<td>Instrucción JMP ABS para saltar a la función BASIC actual, cuya dirección está en $0055-$0056 .</td>
+</tr>
+<tr>
+<td align="center">87-91</td>
+<td align="center">$0057-$005B</td>
+<td align="center">-</td>
+<td>Registro aritmético 3 (5 bytes).</td>
+</tr>
+<tr>
+<td align="center">92-96</td>
+<td align="center">$005C-$0060</td>
+<td align="center">-</td>
+<td>Registro aritmético 4 (5 bytes).</td>
+</tr>
+<tr>
+<td align="center">97-101</td>
+<td align="center">$0061-$0065</td>
+<td align="center">-</td>
+<td>FAC: Registro aritmético 1 (5 bytes).</td>
+</tr>
+<tr>
+<td align="center">102</td>
+<td align="center">$0066</td>
+<td align="center">-</td>
+<td>Signo del FAC (<strong>Bit 7:</strong> <strong>0</strong> = Positivo; <strong>1</strong> = Negativo).</td>
+</tr>
+<tr>
+<td align="center">103</td>
+<td align="center">$0067</td>
+<td align="center">-</td>
+<td>Número de grados durante una evaluación polinómica.</td>
+</tr>
+<tr>
+<td align="center">104</td>
+<td align="center">$0068</td>
+<td align="center">-</td>
+<td>Área temporal durante varias operaciones.</td>
+</tr>
+<tr>
+<td align="center">105-109</td>
+<td align="center">$0069-$006D</td>
+<td align="center">-</td>
+<td>ARG: Registro aritmético 2 (5 bytes).</td>
+</tr>
+<tr>
+<td align="center">110</td>
+<td align="center">$006E</td>
+<td align="center">-</td>
+<td>Signo del ARG (<strong>Bit 7:</strong> <strong>0</strong> = Positivo; <strong>1</strong> = Negativo).</td>
+</tr>
+<tr>
+<td align="center">111-112</td>
+<td align="center">$006F-$0070</td>
+<td align="center">-</td>
+<td>Puntero a la primera expresión de cadena durante una comparación de cadenas.</td>
+</tr>
+<tr>
+<td align="center">113-114</td>
+<td align="center">$0071-$0072</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (arrays, <code>VAL</code>, evaluación polinómica).</td>
+</tr>
+<tr>
+<td align="center">115-138</td>
+<td align="center">$0073-$008A</td>
+<td align="center">-</td>
+<td>Usado por CHRGET para leer el siguiente byte de un programa BASIC o comando directo (24 bytes). Dirección $0079: Usado por CHRGOT para leer el byte actual de un programa BASIC o comando directo. Dirección $007A-$007B: Puntero al byte actual de un programa BASIC o comando directo.</td>
+</tr>
+<tr>
+<td align="center">139-143</td>
+<td align="center">$008B-$008F</td>
+<td align="center">-</td>
+<td>Resultado anterior de <code>RND</code>.</td>
+</tr>
+<tr>
+<td align="center">144</td>
+<td align="center">$0090</td>
+<td align="center">-</td>
+<td>Valor de la variable <code>STATUS</code> para el estado del dispositivo para la E/S del puerto serie y el <em>datasette</em>. Bits del puerto serie:<br>+ <strong>Bit 0:</strong> Dirección al presentarse un <em>timeout</em> <strong>0</strong> = Entrada; <strong>1</strong> = Salida.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Error de <em>timeout</em>.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Error en <code>VERIFY</code>.<br>+ <strong>Bit 6:</strong> <strong>1</strong> = Final de fichero.<br>+ <strong>Bit 7:</strong> <strong>1</strong> = Error de dispositivo no encontrado.<br> Bits del <em>datasette</em>:<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Bloque demasiado corto (&lt; 192 bytes).<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Bloque demasiado largo (&gt; 192 bytes).<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Error en <code>VERIFY</code>.<br>+ <strong>Bit 5:</strong> <strong>1</strong> = Error de <em>checksum</em> .<br>+ <strong>Bit 6:</strong> <strong>1</strong> = Final de fichero (sólo mientras está leyendo) .</td>
+</tr>
+<tr>
+<td align="center">145</td>
+<td align="center">$0091</td>
+<td align="center">-</td>
+<td>Estado de la tecla <code>RUN/STOP</code> (<strong>$7F</strong> = Pulsada; <strong>$FF</strong> = No pulsada).</td>
+</tr>
+<tr>
+<td align="center">146</td>
+<td align="center">$0092</td>
+<td align="center">-</td>
+<td>Desconocido. (Constante de tiempo durante la entrada del <em>datasette</em>.)</td>
+</tr>
+<tr>
+<td align="center">147</td>
+<td align="center">$0093</td>
+<td align="center">-</td>
+<td>Flag <code>LOAD</code>/<code>VERIFY</code> (<strong>$00</strong> = <code>LOAD</code>; <strong>$01</strong>-<strong>$FF</strong> = <code>VERIFY</code>).</td>
+</tr>
+<tr>
+<td align="center">148</td>
+<td align="center">$0094</td>
+<td align="center">-</td>
+<td>Estado de la cache de salida del puerto serie (<strong>Bit 7:</strong> <strong>1</strong> = Cache de salida modificada, hay que transferir el contenido en la próxima salida del bus).</td>
+</tr>
+<tr>
+<td align="center">149</td>
+<td align="center">$0095</td>
+<td align="center">-</td>
+<td>Cache de salida del puerto serie, byte previo para enviar al bus.</td>
+</tr>
+<tr>
+<td align="center">150</td>
+<td align="center">$0096</td>
+<td align="center">-</td>
+<td>Desconocido. (Indicador de final de cinta durante la E/S del <em>datasette</em>.)</td>
+</tr>
+<tr>
+<td align="center">151</td>
+<td align="center">$0097</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el valor original del registro X durante la entrada del RS-232 o el registro Y durante la entrada del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">152</td>
+<td align="center">$0098</td>
+<td align="center">-</td>
+<td>Número de ficheros actualmente abiertos (0-10).</td>
+</tr>
+<tr>
+<td align="center">153</td>
+<td align="center">$0099</td>
+<td align="center">$00</td>
+<td>Número de dispositivo de entrada actual (teclado por defecto).</td>
+</tr>
+<tr>
+<td align="center">154</td>
+<td align="center">$009A</td>
+<td align="center">$03</td>
+<td>Número de dispositivo de salida actual (pantalla por defecto).</td>
+</tr>
+<tr>
+<td align="center">155</td>
+<td align="center">$009B</td>
+<td align="center">-</td>
+<td>Desconocido. (Bit de paridad durante la E/S del <em>datasette</em>.)</td>
+</tr>
+<tr>
+<td align="center">156</td>
+<td align="center">$009C</td>
+<td align="center">-</td>
+<td>Desconocido. (Indicador de byte preparado durante la E/S del <em>datasette</em>.)</td>
+</tr>
+<tr>
+<td align="center">157</td>
+<td align="center">$009D</td>
+<td align="center">-</td>
+<td>Flag de mostrar errores del sistema:<br>+ <strong>Bit 6:</strong> <strong>0</strong> = Eliminar mensajes de errores de E/S; <strong>1</strong> = Mostrarlos.<br>+ <strong>Bit 7:</strong> <strong>0</strong> = Eliminar mensajes de errores de sistema; <strong>1</strong> = Mostrarlos.</td>
+</tr>
+<tr>
+<td align="center">158</td>
+<td align="center">$009E</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (E/S del RS-232 y del <em>datasette</em>, <code>LOAD</code>).</td>
+</tr>
+<tr>
+<td align="center">159</td>
+<td align="center">$009F</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (E/S del <em>datasette</em>, <code>LOAD</code>).</td>
+</tr>
+<tr>
+<td align="center">160-162</td>
+<td align="center">$00A0-$00A2</td>
+<td align="center">-</td>
+<td>Variable <code>TIME</code> (hora del día), incrementada en una unidad cada 60 Hz.</td>
+</tr>
+<tr>
+<td align="center">163</td>
+<td align="center">$00A3</td>
+<td align="center">-</td>
+<td>Flag EOI durante la salida del puerto serie (<strong>Bit 7:</strong> <strong>0</strong> = Enviar byte después del <em>handshake</em>; <strong>1</strong> = Realizar retardo EOI primero).<br>Contador de bits durante la salida del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">164</td>
+<td align="center">$00A4</td>
+<td align="center">-</td>
+<td>Buffer de bytes durante la entrada del puerto serie.<br>Paridad durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">165</td>
+<td align="center">$00A5</td>
+<td align="center">-</td>
+<td>Contador de bits durante la E/S del puerto serie.<br>Contador de la marca de sincronización durante la salida del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">166</td>
+<td align="center">$00A6</td>
+<td align="center">-</td>
+<td>Desplazamiento del byte actual en el buffer del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">167</td>
+<td align="center">$00A7</td>
+<td align="center">-</td>
+<td>Buffer de bits durante la entrada del RS-232.</td>
+</tr>
+<tr>
+<td align="center">168</td>
+<td align="center">$00A8</td>
+<td align="center">-</td>
+<td>Contador de bits durante la entrada del RS-232.</td>
+</tr>
+<tr>
+<td align="center">169</td>
+<td align="center">$00A9</td>
+<td align="center">-</td>
+<td>Flag de parada de bit durante la entrada del RS-232 (<strong>$00</strong> = Bit de datos; <strong>$01-$FF</strong> = Bit de parada).</td>
+</tr>
+<tr>
+<td align="center">170</td>
+<td align="center">$00AA</td>
+<td align="center">-</td>
+<td>Buffer de bytes durante la entrada del RS-232.</td>
+</tr>
+<tr>
+<td align="center">171</td>
+<td align="center">$00AB</td>
+<td align="center">-</td>
+<td>Paridad durante la entrada del RS-232.<br><em>Checksum</em> de bloque durante la entrada del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">172-173</td>
+<td align="center">$00AC-$00AD</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>SAVE</code>, desplazamiento de pantalla).</td>
+</tr>
+<tr>
+<td align="center">174-175</td>
+<td align="center">$00AE-$00AF</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>LOAD</code>, <code>VERIFY</code>, <code>SAVE</code>, desplazamiento del color de pantalla).</td>
+</tr>
+<tr>
+<td align="center">176-177</td>
+<td align="center">$00B0-$00B1</td>
+<td align="center">-</td>
+<td>Desconocido.</td>
+</tr>
+<tr>
+<td align="center">178-179</td>
+<td align="center">$00B2-$00B3</td>
+<td align="center">$033C</td>
+<td>Puntero al buffer del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">180</td>
+<td align="center">$00B4</td>
+<td align="center">-</td>
+<td>Flag de contador de bits y bits de parada durante la salida del RS-232 (<strong>Bits 0-6:</strong> Contador de bits; <strong>Bit 7:</strong> <strong>0</strong> = Bit de datos; <strong>1</strong> = Bit de parada).<br>Contador de bits durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">181</td>
+<td align="center">$00B5</td>
+<td align="center">-</td>
+<td>Buffer de bits durante la salida del RS-232.</td>
+</tr>
+<tr>
+<td align="center">182</td>
+<td align="center">$00B6</td>
+<td align="center">-</td>
+<td>Buffer de bytes durante la salida del RS-232.</td>
+</tr>
+<tr>
+<td align="center">183</td>
+<td align="center">$00B7</td>
+<td align="center">-</td>
+<td>Tamaño del nombre de fichero o comando de discos (<strong>$00</strong> = Sin parámetro; <strong>$01-$FF</strong> = Tamaño). Usado por <code>LOAD</code>, <code>SAVE</code>, <code>VERIFY</code> y <code>OPEN</code>.</td>
+</tr>
+<tr>
+<td align="center">184</td>
+<td align="center">$00B8</td>
+<td align="center">-</td>
+<td>Identificador del fichero actual.</td>
+</tr>
+<tr>
+<td align="center">185</td>
+<td align="center">$00B9</td>
+<td align="center">-</td>
+<td>Modo secundario del fichero actual.</td>
+</tr>
+<tr>
+<td align="center">186</td>
+<td align="center">$00BA</td>
+<td align="center">-</td>
+<td>Número de dispositivo del fichero actual.</td>
+</tr>
+<tr>
+<td align="center">187-188</td>
+<td align="center">$00BB-$00BC</td>
+<td align="center">-</td>
+<td>Puntero al nombre de fichero o comando de discos actual. Usado por <code>LOAD</code>, <code>SAVE</code>, <code>VERIFY</code> y <code>OPEN</code>.</td>
+</tr>
+<tr>
+<td align="center">189</td>
+<td align="center">$00BD</td>
+<td align="center">-</td>
+<td>Paridad durante la salida del RS-232.<br>Buffer de bytes durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">190</td>
+<td align="center">$00BE</td>
+<td align="center">-</td>
+<td>Bloqueo del contador durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">191</td>
+<td align="center">$00BF</td>
+<td align="center">-</td>
+<td>Desconocido.</td>
+</tr>
+<tr>
+<td align="center">192</td>
+<td align="center">$00C0</td>
+<td align="center">-</td>
+<td>Flag del motor del <em>datasette</em>:<br>+ <strong>$00</strong> = Ningún botón pulsado, motor desactivado. Si se pulsa algún botón se activará el motor.<br>+ <strong>$01-$FF</strong> = Motor activado.</td>
+</tr>
+<tr>
+<td align="center">193-194</td>
+<td align="center">$00C1-$00C2</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>LOAD</code>, <code>VERIFY</code>, <code>SAVE</code>, test de memoria).</td>
+</tr>
+<tr>
+<td align="center">195-196</td>
+<td align="center">$00C3-$00C4</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (<code>LOAD</code>, <code>VERIFY</code>, vectores de E/S).</td>
+</tr>
+<tr>
+<td align="center">197</td>
+<td align="center">$00C5</td>
+<td align="center">-</td>
+<td>Código matriz de tecla previamente pulsado (<strong>$00-$3F</strong> = Tecla; <strong>$40</strong> = Nada pulsado).</td>
+</tr>
+<tr>
+<td align="center">198</td>
+<td align="center">$00C6</td>
+<td align="center">-</td>
+<td>Tamaño del buffer de teclado (<strong>$00</strong> = Vacío; <strong>$01-$0A</strong> = Tamaño).</td>
+</tr>
+<tr>
+<td align="center">199</td>
+<td align="center">$00C7</td>
+<td align="center">-</td>
+<td>Flag modo inverso (<strong>$00</strong> = Normal; <strong>$12</strong> = Invertido).</td>
+</tr>
+<tr>
+<td align="center">200</td>
+<td align="center">$00C8</td>
+<td align="center">-</td>
+<td>Tamaño de línea menos 1 durante la entrada de pantalla (39, 79).</td>
+</tr>
+<tr>
+<td align="center">201</td>
+<td align="center">$00C9</td>
+<td align="center">-</td>
+<td>Fila del cursor durante la entrada de pantalla (0-24).</td>
+</tr>
+<tr>
+<td align="center">202</td>
+<td align="center">$00CA</td>
+<td align="center">-</td>
+<td>Columna del cursor durante la entrada de pantalla (0-39).</td>
+</tr>
+<tr>
+<td align="center">203</td>
+<td align="center">$00CB</td>
+<td align="center">-</td>
+<td>Código matriz de tecla actualmente pulsado (<strong>$00-$3F</strong> = Tecla; <strong>$40</strong> = Nada pulsado).</td>
+</tr>
+<tr>
+<td align="center">204</td>
+<td align="center">$00CC</td>
+<td align="center">-</td>
+<td>Flag de visibilidad del cursor (<strong>$00</strong> = Encendido; <strong>$01-$FF</strong> = Apagado).</td>
+</tr>
+<tr>
+<td align="center">205</td>
+<td align="center">$00CD</td>
+<td align="center">-</td>
+<td>Retardo del cambio de fase del cursor (<strong>$00</strong> = Debe cambiar de fase; <strong>$01-$14</strong> = Retardo).</td>
+</tr>
+<tr>
+<td align="center">206</td>
+<td align="center">$00CE</td>
+<td align="center">-</td>
+<td>Código de pantalla del carácter bajo el cursor.</td>
+</tr>
+<tr>
+<td align="center">207</td>
+<td align="center">$00CF</td>
+<td align="center">-</td>
+<td>Flag de fase del cursor (<strong>$00</strong> = Fase apagada, carácter original visible; <strong>$01</strong> = Fase encendida, carácter invertido visible).</td>
+</tr>
+<tr>
+<td align="center">208</td>
+<td align="center">$00D0</td>
+<td align="center">-</td>
+<td>Flag de fin de línea durante la entrada de pantalla (<strong>$00</strong> = Carácter de retorno alcanzado, fin de línea (EOL); <strong>$01-$FF</strong> = Seguir leyendo caracteres de la línea).</td>
+</tr>
+<tr>
+<td align="center">209-210</td>
+<td align="center">$00D1-$00D2</td>
+<td align="center">-</td>
+<td>Puntero a la línea actual de la memoria de pantalla.</td>
+</tr>
+<tr>
+<td align="center">211</td>
+<td align="center">$00D3</td>
+<td align="center">-</td>
+<td>Columna actual del cursor (0-39).</td>
+</tr>
+<tr>
+<td align="center">212</td>
+<td align="center">$00D4</td>
+<td align="center">-</td>
+<td>Flag modo comillas dobles (<strong>$00</strong> = Modo normal; <strong>$01</strong> = Modo comillas dobles).</td>
+</tr>
+<tr>
+<td align="center">213</td>
+<td align="center">$00D5</td>
+<td align="center">-</td>
+<td>Tamaño de línea actual de pantalla menos 1 (39, 79).</td>
+</tr>
+<tr>
+<td align="center">214</td>
+<td align="center">$00D6</td>
+<td align="center">-</td>
+<td>Fila actual del cursor (0-24).</td>
+</tr>
+<tr>
+<td align="center">215</td>
+<td align="center">$00D7</td>
+<td align="center">-</td>
+<td>Usado por varias operaciones (E/S de pantalla, <em>datasette</em>).</td>
+</tr>
+<tr>
+<td align="center">216</td>
+<td align="center">$00D8</td>
+<td align="center">-</td>
+<td>Número de inserciones (<strong>$00</strong> = Ninguna; <strong>$01-$FF</strong> = Inserciones). Cuando se insertan huecos en una línea, la entrada de la pantalla actuará de forma similar al modo comillas dobles para esas posiciones.</td>
+</tr>
+<tr>
+<td align="center">217-241</td>
+<td align="center">$00D9-$00F1</td>
+<td align="center">-</td>
+<td>Byte alto de punteros a cada línea en la memoria de pantalla (25 bytes; <strong>$00-$7F</strong> = Byte alto del puntero; <strong>$80-$FF</strong> = Sin puntero, la línea es una extensión de la anterior).</td>
+</tr>
+<tr>
+<td align="center">242</td>
+<td align="center">$00F2</td>
+<td align="center">-</td>
+<td>Área temporal durante el desplazamiento de la pantalla.</td>
+</tr>
+<tr>
+<td align="center">243-244</td>
+<td align="center">$00F3-$00F4</td>
+<td align="center">-</td>
+<td>Puntero a la línea actual en la RAM de color.</td>
+</tr>
+<tr>
+<td align="center">245-246</td>
+<td align="center">$00F5-$00F6</td>
+<td align="center">-</td>
+<td>Puntero a la tabla de conversión durante la traducción de códigos de matriz de teclado a PETSCII.</td>
+</tr>
+<tr>
+<td align="center">247-248</td>
+<td align="center">$00F7-$00F8</td>
+<td align="center">-</td>
+<td>Puntero al buffer de entrada del RS-232 (<strong>$0000-$00FF</strong> = Buffer no definido; <strong>$0100-$FFFF</strong> = Puntero al buffer).</td>
+</tr>
+<tr>
+<td align="center">249-250</td>
+<td align="center">$00F9-$00FA</td>
+<td align="center">-</td>
+<td>Puntero al buffer de salida del RS-232 (<strong>$0000-$00FF</strong> = Buffer no definido; <strong>$0100-$FFFF</strong> = Puntero al buffer).</td>
+</tr>
+<tr>
+<td align="center">251-254</td>
+<td align="center">$00FB-$00FE</td>
+<td align="center">-</td>
+<td>Sin uso (4 bytes).</td>
+</tr>
+<tr>
+<td align="center">255-266</td>
+<td align="center">$00FF-$010A</td>
+<td align="center">-</td>
+<td>Buffer para convertir número flotantes a cadena (12 bytes).<br><strong>NOTA:</strong> Invade el espacio final de la pila de programa.</td>
+</tr>
+</tbody>
+</table><h2 id="pila-de-programa">Pila de programa</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">256-317</td>
+<td align="center">$0100-$013D</td>
+<td>Punteros a los bytes de lectura con errores durante la lectura del <em>datasette</em> (62 bytes, 31 entradas).</td>
+</tr>
+<tr>
+<td align="center">256-511</td>
+<td align="center">$0100-$01FF</td>
+<td>Pila del procesador. También se utiliza para almacenar datos para gestionar los <code>FOR</code> y los <code>GOSUB</code>.</td>
+</tr>
+</tbody>
+</table><h2 id="gestión-de-entradasalida">Gestión de Entrada/Salida</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">512-600</td>
+<td align="center">$0200-$0258</td>
+<td align="center">-</td>
+<td>Buffer de entrada, para leer datos de la pantalla (89 bytes).</td>
+</tr>
+<tr>
+<td align="center">601-610</td>
+<td align="center">$0259-$0262</td>
+<td align="center">-</td>
+<td>Identificadores de ficheros abiertos (10 bytes, 10 entradas).</td>
+</tr>
+<tr>
+<td align="center">611-620</td>
+<td align="center">$0263-$026C</td>
+<td align="center">-</td>
+<td>Dispositivos de los ficheros abiertos (10 bytes, 10 entradas).</td>
+</tr>
+<tr>
+<td align="center">621-630</td>
+<td align="center">$026D-$0276</td>
+<td align="center">-</td>
+<td>Modo secundario de los ficheros abiertos (10 bytes, 10 entradas).</td>
+</tr>
+<tr>
+<td align="center">631-640</td>
+<td align="center">$0277-$0280</td>
+<td align="center">-</td>
+<td>Buffer de teclado (10 bytes, 10 entradas).</td>
+</tr>
+<tr>
+<td align="center">641-642</td>
+<td align="center">$0281-$0282</td>
+<td align="center">$0800</td>
+<td>Puntero al inicio de la memoria para BASIC después del test de memoria.</td>
+</tr>
+<tr>
+<td align="center">643-644</td>
+<td align="center">$0283-$0284</td>
+<td align="center">$A000</td>
+<td>Puntero al final de la memoria para BASIC después del test de memoria.</td>
+</tr>
+<tr>
+<td align="center">645</td>
+<td align="center">$0285</td>
+<td align="center">-</td>
+<td>Sin uso (<em>timeout</em> del puerto serie).</td>
+</tr>
+<tr>
+<td align="center">646</td>
+<td align="center">$0286</td>
+<td align="center">-</td>
+<td>Color del cursor (<strong>$00</strong>-<strong>$0F</strong>).</td>
+</tr>
+<tr>
+<td align="center">647</td>
+<td align="center">$0287</td>
+<td align="center">-</td>
+<td>Color del carácter bajo el cursor (<strong>$00</strong>-<strong>$0F</strong>).</td>
+</tr>
+<tr>
+<td align="center">648</td>
+<td align="center">$0288</td>
+<td align="center">$04</td>
+<td>Byte alto del puntero a la memoria de pantalla para la entrada/salida de la terminal.</td>
+</tr>
+<tr>
+<td align="center">649</td>
+<td align="center">$0289</td>
+<td align="center">-</td>
+<td>Tamaño máximo del buffer de teclado (<strong>$00</strong> = Sin buffer; <strong>$01-$0F</strong> = Tamaño).</td>
+</tr>
+<tr>
+<td align="center">650</td>
+<td align="center">$028A</td>
+<td align="center">-</td>
+<td>Flag de repetición del teclado. <strong>Bits 6-7:</strong> <strong>00</strong> = <code>⇑CRSR⇓</code>, <code>⇐CRSR⇒</code>, <code>INST/DEL</code> y <code>SPACE</code>; <strong>01</strong> = Ninguna; <strong>1x</strong> = Todas.</td>
+</tr>
+<tr>
+<td align="center">651</td>
+<td align="center">$028B</td>
+<td align="center">-</td>
+<td>Retardo durante la repetición, entre sucesivas repeticiones (<strong>$00</strong> = Sin retardo; <strong>$01-$04</strong> = Con retardo).</td>
+</tr>
+<tr>
+<td align="center">652</td>
+<td align="center">$028C</td>
+<td align="center">-</td>
+<td>Retardo durante la repetición, para retardar antes de la primera repetición (<strong>$00</strong> = Sin retardo; <strong>$01-$04</strong> = Con retardo).</td>
+</tr>
+<tr>
+<td align="center">653</td>
+<td align="center">$028D</td>
+<td align="center">-</td>
+<td>Indicador de teclas modificadoras:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Alguna tecla <code>SHIFT</code> está pulsada.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = La tecla <code>C=</code> está pulsada.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = La tecla <code>CTRL</code> está pulsada.</td>
+</tr>
+<tr>
+<td align="center">654</td>
+<td align="center">$028E</td>
+<td align="center">-</td>
+<td>Indicador previo de teclas modificadoras en el anterior escaneo:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Alguna tecla <code>SHIFT</code> estuvo pulsada.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = La tecla <code>C=</code> estuvo pulsada.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = La tecla <code>CTRL</code> estuvo pulsada.</td>
+</tr>
+<tr>
+<td align="center">655-656</td>
+<td align="center">$028F-$0290</td>
+<td align="center">$EB48</td>
+<td>Puntero a la rutina, que basada en el estado de las teclas modificadoras, modifica el puntero en la dirección $00F5-$00F6 a la tabla de conversión pertinente que traduce códigos de teclado a PETSCII.</td>
+</tr>
+<tr>
+<td align="center">657</td>
+<td align="center">$0291</td>
+<td align="center">-</td>
+<td>Flag <code>C=</code>+<code>SHIFT</code> para cambiar entre los modos de fuente de la terminal (<strong>Bit 7:</strong> <strong>0</strong> = Activado; <strong>1</strong> = Desactivado).</td>
+</tr>
+<tr>
+<td align="center">658</td>
+<td align="center">$0292</td>
+<td align="center">-</td>
+<td>Flag de dirección del desplazamiento en la terminal (<strong>$00</strong> = Insertar líneas desplazando hacia abajo; <strong>$01-$FF</strong> = Insertar líneas desplazando hacia arriba).</td>
+</tr>
+<tr>
+<td align="center">659</td>
+<td align="center">$0293</td>
+<td align="center">-</td>
+<td>Registro de control del RS-232:<br>+ <strong>Bits 0-3:</strong> Velocidad de transferencia en baudios. Valores:<br><strong>0000</strong> = Valor Usuario;<br><strong>0001</strong> = 50 bit/s;<br><strong>0010</strong> = 75 bit/s;<br><strong>0011</strong> = 110 bit/s;<br><strong>0100</strong> = 150 bit/s;<br><strong>0101</strong> = 300 bit/s;<br><strong>0110</strong> = 600 bit/s;<br><strong>0111</strong> = 1200 bit/s;<br><strong>1000</strong> = 2400 bit/s;<br><strong>1001</strong> = 1800 bit/s;<br><strong>1010</strong> = 2400 bit/s;<br><strong>1011</strong> = 3600 bit/s;<br><strong>1100</strong> = 4800 bit/s;<br><strong>1101</strong> = 7200 bit/s;<br><strong>1110</strong> = 9600 bit/s;<br><strong>1111</strong> = 19200 bit/s.<br>+ <strong>Bits 5-6:</strong> Número de bits de datos por byte (<strong>00</strong> = 8; <strong>01</strong> = 7; <strong>10</strong> = 6; <strong>11</strong> = 5).<br>+ <strong>Bit 7:</strong> Número de bits de parada (<strong>0</strong> = 1; <strong>1</strong> = 2).</td>
+</tr>
+<tr>
+<td align="center">660</td>
+<td align="center">$0294</td>
+<td align="center">-</td>
+<td>Registro de comandos del RS-232:<br>+ <strong>Bit 0:</strong> Tipo de sincronización (<strong>0</strong> = 3 líneas; <strong>1</strong> = X líneas).<br>+ <strong>Bit 4:</strong> Tipo de transmisión (<strong>0</strong> = Duplex; <strong>1</strong> = Half duplex).<br>+ <strong>Bits 5-7:</strong> Modo de paridad. Valores:<br><strong>xx0</strong> = Sin comprobación de paridad, el bit 7 no existe;<br><strong>001</strong> = Paridad impar;<br><strong>011</strong> = Paridad par;<br><strong>101</strong> = Sin comprobación de paridad, el bit 7 es siempre 1;<br><strong>111</strong> = Sin comprobación de paridad, el bit 7 es siempre 0.</td>
+</tr>
+<tr>
+<td align="center">661-662</td>
+<td align="center">$0295-$0296</td>
+<td align="center">-</td>
+<td>Valor por defecto del reloj de salida del RS-232, basado en la velocidad en baudios. (Debe ser configurado, antes de cualquier operación de E/S, si la velocidad en baudios es “Valor Usuario” en $0293.)</td>
+</tr>
+<tr>
+<td align="center">663</td>
+<td align="center">$0297</td>
+<td align="center">-</td>
+<td>Valor de la variable <code>STATUS</code> para el estado del dispositivo para la E/S del RS-232:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Error de paridad.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Error de marco (bit de stop con el valor 0).<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Desbordamiento del buffer de entrada (demasiada información ha llegado sin ser leída del buffer).<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Buffer de entrada vacío, nada que leer.<br>+ <strong>Bit 4:</strong> <strong>0</strong> = <em>Sender</em> en CTS; <strong>1</strong> = <em>Sender</em> no preparado para enviar.<br>+ <strong>Bit 6:</strong> <strong>0</strong> = <em>Receiver</em> en DSR; <strong>1</strong> = <em>Receiver</em> no preparado para recibir.<br>+ <strong>Bit 7:</strong> <strong>1</strong> = Fallo de envío, un bit de parada y de datos ambos con el valor 0.</td>
+</tr>
+<tr>
+<td align="center">664</td>
+<td align="center">$0298</td>
+<td align="center">-</td>
+<td>Tamaño de byte del RS-232, número de bits de datos por byte de datos, valor por defecto del conteo de bits.</td>
+</tr>
+<tr>
+<td align="center">665-666</td>
+<td align="center">$0299-$029A</td>
+<td align="center">-</td>
+<td>Valor por defecto del reloj de entrada del RS-232, basado en la velocidad en baudios. (Calculado automáticamente con el valor en $0295-$0296.)</td>
+</tr>
+<tr>
+<td align="center">667</td>
+<td align="center">$029B</td>
+<td align="center">-</td>
+<td>Desplazamiento del byte recibido en el búfer de entrada RS-232.</td>
+</tr>
+<tr>
+<td align="center">668</td>
+<td align="center">$029C</td>
+<td align="center">-</td>
+<td>Desplazamiento del byte actual en el búfer de entrada RS-232.</td>
+</tr>
+<tr>
+<td align="center">669</td>
+<td align="center">$029D</td>
+<td align="center">-</td>
+<td>Desplazamiento del byte recibido en el búfer de salida RS-232.</td>
+</tr>
+<tr>
+<td align="center">670</td>
+<td align="center">$029E</td>
+<td align="center">-</td>
+<td>Desplazamiento del byte actual en el búfer de salida RS-232.</td>
+</tr>
+<tr>
+<td align="center">671-672</td>
+<td align="center">$029F-$02A0</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el puntero original a la rutina de servicio de interrupciones durante la E/S del <em>datasette</em>:<br>+ <strong>$0000-$00FF</strong> = Ninguna E/S del <em>datasette</em> ha ocurrido o el puntero original ya ha sido restaurado.<br>+ <strong>$0100-$FFFF</strong> = El puntero original, E/S del <em>datasette</em> actualmente en progreso.</td>
+</tr>
+<tr>
+<td align="center">673</td>
+<td align="center">$02A1</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el estado original del registro de control de interrupciones de la CIA2 ($DD0D) durante la E/S del RS-232.</td>
+</tr>
+<tr>
+<td align="center">674</td>
+<td align="center">$02A2</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el estado original del registro de control de la cuenta atrás B de la CIA2 ($DC0F) durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">675</td>
+<td align="center">$02A3</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el estado original del registro de control de interrupciones de la CIA1 ($DC0D) durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">676</td>
+<td align="center">$02A4</td>
+<td align="center">-</td>
+<td>Área temporal para guardar el estado original del registro de control de la cuenta atrás A de la CIA2 ($DC0E) durante la E/S del <em>datasette</em>.</td>
+</tr>
+<tr>
+<td align="center">677</td>
+<td align="center">$02A5</td>
+<td align="center">-</td>
+<td>Número de línea siendo desplazada durante el desplazamiento de la pantalla.</td>
+</tr>
+<tr>
+<td align="center">678</td>
+<td align="center">$02A6</td>
+<td align="center">-</td>
+<td>Flag PAL/NTSC, para seleccionar la velocidad adecuada en baudios para el RS-232 (<strong>$00</strong> = NTSC; <strong>$01</strong> = PAL).</td>
+</tr>
+<tr>
+<td align="center">679-767</td>
+<td align="center">$02A7-$02FF</td>
+<td align="center">-</td>
+<td>Sin uso (89 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="memoria-del-sistema">Memoria del Sistema</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">768-769</td>
+<td align="center">$0300-$0301</td>
+<td align="center">$E38B</td>
+<td>Puntero a la rutina de reinicio suave, mostrando si hay algún mensaje de error y entrando en el bucle de inactividad de BASIC.</td>
+</tr>
+<tr>
+<td align="center">770-771</td>
+<td align="center">$0302-$0303</td>
+<td align="center">$A483</td>
+<td>Puntero a la rutina del bucle de inactividad de BASIC.</td>
+</tr>
+<tr>
+<td align="center">772-773</td>
+<td align="center">$0304-$0305</td>
+<td align="center">$A57C</td>
+<td>Puntero a la rutina del <em>tokenizer</em> de BASIC.</td>
+</tr>
+<tr>
+<td align="center">774-775</td>
+<td align="center">$0306-$0307</td>
+<td align="center">$A71A</td>
+<td>Puntero a la rutina de descodificación de tokens de BASIC.</td>
+</tr>
+<tr>
+<td align="center">776-777</td>
+<td align="center">$0308-$0309</td>
+<td align="center">$A7E4</td>
+<td>Puntero a la rutina de ejecución de instrucciones BASIC.</td>
+</tr>
+<tr>
+<td align="center">778-779</td>
+<td align="center">$030A-$030B</td>
+<td align="center">$AE86</td>
+<td>Puntero a la rutina que lee el siguiente elemento en una expresión BASIC.</td>
+</tr>
+<tr>
+<td align="center">780</td>
+<td align="center">$030C</td>
+<td align="center">-</td>
+<td>Registro A para <code>SYS</code>.</td>
+</tr>
+<tr>
+<td align="center">781</td>
+<td align="center">$030D</td>
+<td align="center">-</td>
+<td>Registro X para <code>SYS</code>.</td>
+</tr>
+<tr>
+<td align="center">782</td>
+<td align="center">$030E</td>
+<td align="center">-</td>
+<td>Registro Y para <code>SYS</code>.</td>
+</tr>
+<tr>
+<td align="center">783</td>
+<td align="center">$030F</td>
+<td align="center">-</td>
+<td>Registro de estado para <code>SYS</code>.</td>
+</tr>
+<tr>
+<td align="center">784-786</td>
+<td align="center">$0310-$0312</td>
+<td align="center">-</td>
+<td>Instrucción JMP ABS para saltar a la función <code>USR</code>, cuya dirección está en $0311-$0312.</td>
+</tr>
+<tr>
+<td align="center">787</td>
+<td align="center">$0313</td>
+<td align="center">-</td>
+<td>Sin uso.</td>
+</tr>
+<tr>
+<td align="center">788-789</td>
+<td align="center">$0314-$0315</td>
+<td align="center">$EA31</td>
+<td>Puntero a la rutina de servicio de interrupciones.</td>
+</tr>
+<tr>
+<td align="center">790-791</td>
+<td align="center">$0316-$0317</td>
+<td align="center">$FE66</td>
+<td>Puntero a la rutina de servicio BRK.</td>
+</tr>
+<tr>
+<td align="center">792-793</td>
+<td align="center">$0318-$0319</td>
+<td align="center">$FE47</td>
+<td>Puntero a la rutina de servicio de interrupciones no-enmascarables.</td>
+</tr>
+<tr>
+<td align="center">794-795</td>
+<td align="center">$031A-$031B</td>
+<td align="center">$F34A</td>
+<td>Puntero a OPEN, rutina para abrir ficheros.</td>
+</tr>
+<tr>
+<td align="center">796-797</td>
+<td align="center">$031C-$031D</td>
+<td align="center">$F291</td>
+<td>Puntero a CLOSE, rutina para cerrar ficheros.</td>
+</tr>
+<tr>
+<td align="center">798-799</td>
+<td align="center">$031E-$031F</td>
+<td align="center">$F20E</td>
+<td>Puntero a CHKIN, rutina para definir un fichero como entrada por defecto.</td>
+</tr>
+<tr>
+<td align="center">800-801</td>
+<td align="center">$0320-$0321</td>
+<td align="center">$F250</td>
+<td>Puntero a CHKOUT, rutina para definir un fichero como salida por defecto.</td>
+</tr>
+<tr>
+<td align="center">802-803</td>
+<td align="center">$0322-$0323</td>
+<td align="center">$F333</td>
+<td>Puntero a CLRCHN, rutina de inicialización de la E/S.</td>
+</tr>
+<tr>
+<td align="center">804-805</td>
+<td align="center">$0324-$0325</td>
+<td align="center">$F157</td>
+<td>Puntero a CHRIN, rutina de entrada de datos, salvo para el teclado y RS-232.</td>
+</tr>
+<tr>
+<td align="center">806-807</td>
+<td align="center">$0326-$0327</td>
+<td align="center">$F1CA</td>
+<td>Puntero a CHROUT, rutina de salida de datos de propósito general.</td>
+</tr>
+<tr>
+<td align="center">808-809</td>
+<td align="center">$0328-$0329</td>
+<td align="center">$F6ED</td>
+<td>Puntero a STOP, rutina para comprobar el estado del indicador de la tecla <code>RUN/STOP</code>, en la dirección $0091.</td>
+</tr>
+<tr>
+<td align="center">810-811</td>
+<td align="center">$032A-$032B</td>
+<td align="center">$F13E</td>
+<td>Puntero a GETIN, rutina de entrada de datos de propósito general.</td>
+</tr>
+<tr>
+<td align="center">812-813</td>
+<td align="center">$032C-$032D</td>
+<td align="center">$F32F</td>
+<td>Puntero a CLALL, rutina para inicializar la E/S y limpiar la tablas de asignación de ficheros.</td>
+</tr>
+<tr>
+<td align="center">814-815</td>
+<td align="center">$032E-$032F</td>
+<td align="center">$FE66</td>
+<td>Sin uso.</td>
+</tr>
+<tr>
+<td align="center">816-817</td>
+<td align="center">$0330-$0331</td>
+<td align="center">$F4A5</td>
+<td>Puntero a LOAD, rutina de cargar ficheros.</td>
+</tr>
+<tr>
+<td align="center">818-819</td>
+<td align="center">$0332-$0333</td>
+<td align="center">$F5ED</td>
+<td>Puntero a SAVE, rutina de guardar fichero.</td>
+</tr>
+<tr>
+<td align="center">820-827</td>
+<td align="center">$0334-$033B</td>
+<td align="center">-</td>
+<td>Sin uso (8 bytes).</td>
+</tr>
+<tr>
+<td align="center">828-1019</td>
+<td align="center">$033C-$03FB</td>
+<td align="center">-</td>
+<td>Buffer del <em>datasette</em> (192 bytes).</td>
+</tr>
+<tr>
+<td align="center">1020-1023</td>
+<td align="center">$03FC-$03FF</td>
+<td align="center">-</td>
+<td>Sin uso (4 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="buffer-de-pantalla-inicial">Buffer de pantalla inicial</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1024-2023</td>
+<td align="center">$0400-$07E7</td>
+<td>Buffer de pantalla (1000 bytes).</td>
+</tr>
+<tr>
+<td align="center">2024-2039</td>
+<td align="center">$07E8-$07F7</td>
+<td>Sin uso (16 bytes).</td>
+</tr>
+<tr>
+<td align="center">2040-2047</td>
+<td align="center">$07F8-$07FF</td>
+<td>Punteros de sprites (8 bytes).</td>
+</tr>
+</tbody>
+</table><p><strong>NOTA:</strong> Al iniciar el C64 esta es la región por defecto para el buffer de pantalla y los punteros de sprite, pero se puede cambiar esa configuración en los registros del VIC-II.</p>
+<h2 id="memoria-de-programas">Memoria de programas</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">2048</td>
+<td align="center">$0800</td>
+<td>Sin uso (necesita el valor 0 para poder ejecutar los programas BASIC).</td>
+</tr>
+<tr>
+<td align="center">2049-40959</td>
+<td align="center">$0801-$9FFF</td>
+<td>Memoria para programas BASIC (38911 bytes).</td>
+</tr>
+<tr>
+<td align="center">32768-40959</td>
+<td align="center">$8000-$9FFF</td>
+<td>ROM de cartuchos opcional (8192 bytes).<br>$8000-$8001: Puntero a la ejecución del reinicio frío.<br>$8002-$8003: Puntero a la ejecución de rutinas de interrupción no enmascarables.<br>$8004-$8008: Firma del cartucho, si contiene la cadena PETSCII <code>"CBM80"</code> los vectores de rutinas son aceptados por el KERNAL.</td>
+</tr>
+<tr>
+<td align="center">40960-49151</td>
+<td align="center">$A000-$BFFF</td>
+<td>ROM BASIC/Memoria RAM.</td>
+</tr>
+<tr>
+<td align="center">49152-53247</td>
+<td align="center">$C000-$CFFF</td>
+<td>Memoria RAM superior.</td>
+</tr>
+</tbody>
+</table><h2 id="rom-de-las-fuentes-de-caracteres">ROM de las fuentes de caracteres</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">53248-55295</td>
+<td align="center">$D000-$D7FF</td>
+<td>Fuente del modo mayúsculas (2048 bytes, 256 caracteres).</td>
+</tr>
+<tr>
+<td align="center">55295-57343</td>
+<td align="center">$D800-$DFFF</td>
+<td>Fuente del modo minúsculas (2048 bytes, 256 caracteres).</td>
+</tr>
+</tbody>
+</table><p align="center"><img src="https://gorkinovich.github.io/learn/C64-Fonts.png" alt="Fuentes del C64"></p>
+<p><strong>NOTA:</strong> Por defecto esta ROM no es accesible, porque la memoria está configurada para acceder a los registros en memoria del VIC-II, SID, CIA1 y CIA2, para realizar operaciones de entrada y salida.</p>
+<h2 id="chip-gráfico-vic-ii">Chip gráfico VIC-II</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">53248</td>
+<td align="center">$D000</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 0 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53249</td>
+<td align="center">$D001</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 0.</td>
+</tr>
+<tr>
+<td align="center">53250</td>
+<td align="center">$D002</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 1 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53251</td>
+<td align="center">$D003</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 1.</td>
+</tr>
+<tr>
+<td align="center">53252</td>
+<td align="center">$D004</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 2 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53253</td>
+<td align="center">$D005</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 2.</td>
+</tr>
+<tr>
+<td align="center">53254</td>
+<td align="center">$D006</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 3 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53255</td>
+<td align="center">$D007</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 3.</td>
+</tr>
+<tr>
+<td align="center">53256</td>
+<td align="center">$D008</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 4 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53257</td>
+<td align="center">$D009</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 4.</td>
+</tr>
+<tr>
+<td align="center">53258</td>
+<td align="center">$D00A</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 5 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53259</td>
+<td align="center">$D00B</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 5.</td>
+</tr>
+<tr>
+<td align="center">53260</td>
+<td align="center">$D00C</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 6 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53261</td>
+<td align="center">$D00D</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 6.</td>
+</tr>
+<tr>
+<td align="center">53262</td>
+<td align="center">$D00E</td>
+<td align="center">-</td>
+<td>Coordenada X del <em>sprite</em> 7 (bits del 0-7).</td>
+</tr>
+<tr>
+<td align="center">53263</td>
+<td align="center">$D00F</td>
+<td align="center">-</td>
+<td>Coordenada Y del <em>sprite</em> 7.</td>
+</tr>
+<tr>
+<td align="center">53264</td>
+<td align="center">$D010</td>
+<td align="center">-</td>
+<td>Bit 8 de la coordenada X de los <em>sprites</em> 0-7.</td>
+</tr>
+<tr>
+<td align="center">53265</td>
+<td align="center">$D011</td>
+<td align="center">$1B (00011011)</td>
+<td>Registro de control de la pantalla:<br>+ <strong>Bits 0-2:</strong> Desplazamiento del <em>raster</em> vertical (<em>scroll raster</em>).<br>+ <strong>Bit 3:</strong> Altura de pantalla. <strong>0</strong> = 24 filas; <strong>1</strong> = 25 filas.<br>+ <strong>Bit 4:</strong> <strong>0</strong> = Pantalla apagada; <strong>1</strong> = Pantalla encendida.<br>+ <strong>Bit 5:</strong> <strong>0</strong> = Modo texto; <strong>1</strong> = Modo bitmap.<br>+ <strong>Bit 6:</strong> <strong>1</strong> = Modo fondo extendido activado.<br>+ <strong>Bit 7:</strong> Lectura: Línea actual del <em>raster</em> (bit 8); Escritura: Línea del <em>raster</em> en la que generar una interrupción (bit 8).</td>
+</tr>
+<tr>
+<td align="center">53266</td>
+<td align="center">$D012</td>
+<td align="center">-</td>
+<td>Lectura: Línea actual del <em>raster</em> (bits 0-7); Escritura: Línea del <em>raster</em> en la que generar una interrupción (bits 0-7).</td>
+</tr>
+<tr>
+<td align="center">53267</td>
+<td align="center">$D013</td>
+<td align="center">-</td>
+<td>Coordenada X del lápiz de luz (bits 1-8).</td>
+</tr>
+<tr>
+<td align="center">53268</td>
+<td align="center">$D014</td>
+<td align="center">-</td>
+<td>Coordenada Y del lápiz de luz.</td>
+</tr>
+<tr>
+<td align="center">53269</td>
+<td align="center">$D015</td>
+<td align="center">-</td>
+<td>Registro de activación de <em>sprites</em>. <strong>Bits 0-7:</strong> <em>Sprite</em> 0-7 activado para dibujarlo en pantalla.</td>
+</tr>
+<tr>
+<td align="center">53270</td>
+<td align="center">$D016</td>
+<td align="center">$C8 (11001000)</td>
+<td>Registro 2 de control de la pantalla:<br>+ <strong>Bits 0-2:</strong> Desplazamiento del <em>raster</em> horizontal (<em>scroll raster</em>).<br>+ <strong>Bit 3:</strong> Ancho de pantalla. <strong>0</strong> = 38 filas; <strong>1</strong> = 40 filas.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Modo multicolor activado.</td>
+</tr>
+<tr>
+<td align="center">53271</td>
+<td align="center">$D017</td>
+<td align="center">-</td>
+<td>Registro de doble altura de <em>sprites</em>. <strong>Bits 0-7:</strong> Doble altura del <em>sprite</em> 0-7 activada.</td>
+</tr>
+<tr>
+<td align="center">53272</td>
+<td align="center">$D018</td>
+<td align="center">-</td>
+<td>Registro de configuración de la memoria:<br>+ <strong>Bits 1-3:</strong> Puntero a la memoria de caracteres en el modo texto (bits 11-13), relativo al banco seleccionado para el VIC con $DD00. Valores:<br><strong>000</strong> = $0000-$07FF (0-2047);<br><strong>001</strong> = $0800-$0FFF (2048-4095);<br><strong>010</strong> = $1000-$17FF (4096-6143);<br><strong>011</strong> = $1800-$1FFF (6144-8191);<br><strong>100</strong> = $2000-$27FF (8192-10239);<br><strong>101</strong> = $2800-$2FFF (10240-12287);<br><strong>110</strong> = $3000-$37FF (12288-14335);<br><strong>111</strong> = $3800-$3FFF (14336-16383).<br>(Los valores 010 y 011 con el banco 0 y 2 del VIC selecciona la ROM de caracteres en lugar de la RAM.)<br>+ <strong>Bits 1-3:</strong> Puntero a la memoria de bitmap en el modo bitmap (bit 13), relativo al banco seleccionado para el VIC con $DD00. Valores:<br><strong>0xx</strong> = $0000-$1FFF (0-8191);<br><strong>1xx</strong> = $2000-$3FFF (8192-16383).<br>+ <strong>Bits 4-7:</strong> Puntero a la memoria de pantalla (bits 10-13), relativo al banco seleccionado para el VIC con $DD00. Valores:<br><strong>0000</strong> = $0000-$03FF (0-1023);<br><strong>0001</strong> = $0400-$07FF (1024-2047);<br><strong>0010</strong> = $0800-$0BFF (2048-3071);<br><strong>0011</strong> = $0C00-$0FFF (3072-4095);<br><strong>0100</strong> = $1000-$13FF (4096-5119);<br><strong>0101</strong> = $1400-$17FF (5120-6143);<br><strong>0110</strong> = $1800-$1BFF (6144-7167);<br><strong>0111</strong> = $1C00-$1FFF (7168-8191);<br><strong>1000</strong> = $2000-$23FF (8192-9215);<br><strong>1001</strong> = $2400-$27FF (9216-10239);<br><strong>1010</strong> = $2800-$2BFF (10240-11263);<br><strong>1011</strong> = $2C00-$2FFF (11264-12287);<br><strong>1100</strong> = $3000-$33FF (12288-13311);<br><strong>1101</strong> = $3400-$37FF (13312-14335);<br><strong>1110</strong> = $3800-$3BFF (14336-15359);<br><strong>1111</strong> = $3C00-$3FFF (15360-16383).</td>
+</tr>
+<tr>
+<td align="center">53273</td>
+<td align="center">$D019</td>
+<td align="center">-</td>
+<td>Registro de estado de interrupciones. Bits de lectura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = La línea actual de <em>raster</em> es igual a la que genera una interrupción.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Colisión <em>sprite</em>-fondo.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Colisión <em>sprite</em>-<em>sprite</em>.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Señal recibida del lápiz de luz.<br>+ <strong>Bit 7:</strong> <strong>1</strong> = Se ha generado una interrupción, por un evento o varios, y esta no ha sido admitida.<br>Bits de escritura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Admitida una interrupción de <em>raster</em>.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Admitida una interrupción de colisión <em>sprite</em>-fondo.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Admitida una interrupción de colisión <em>sprite</em>-<em>sprite</em>.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Admitida una interrupción de lápiz de luz.</td>
+</tr>
+<tr>
+<td align="center">53274</td>
+<td align="center">$D01A</td>
+<td align="center">-</td>
+<td>Registro de control de interrupciones:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Activa las interrupciones de <em>raster</em>.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Activa las interrupciones de colisión <em>sprite</em>-fondo.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Activa las interrupciones de colisión <em>sprite</em>-<em>sprite</em>.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Activa las interrupciones de lápiz de luz.</td>
+</tr>
+<tr>
+<td align="center">53275</td>
+<td align="center">$D01B</td>
+<td align="center">-</td>
+<td>Registro de prioridad de <em>sprites</em>. <strong>Bits 0-7:</strong> <strong>0</strong> = Pintar <em>sprite</em> 0-7 delante de la pantalla; <strong>1</strong> = Pintar <em>sprite</em> 0-7 detrás de la pantalla.</td>
+</tr>
+<tr>
+<td align="center">53276</td>
+<td align="center">$D01C</td>
+<td align="center">-</td>
+<td>Registro de modo multicolor de <em>sprites</em>. <strong>Bits 0-7:</strong> <strong>0</strong> = <em>Sprite</em> 0-7 monocolor; <strong>1</strong> = <em>Sprite</em> 0-7 multicolor.</td>
+</tr>
+<tr>
+<td align="center">53277</td>
+<td align="center">$D01D</td>
+<td align="center">-</td>
+<td>Registro de doble anchura de <em>sprites</em>. <strong>Bits 0-7:</strong> Doble anchura del <em>sprite</em> 0-7 activada.</td>
+</tr>
+<tr>
+<td align="center">53278</td>
+<td align="center">$D01E</td>
+<td align="center">-</td>
+<td>Registro de colisión <em>sprite</em>-<em>sprite</em>. Lectura de bits: <strong>Bits 0-7:</strong> <strong>1</strong> = El <em>sprite</em> 0-7 ha colisionado con otro <em>sprite</em>. Escritura de bits: Activa la detección de las colisiones <em>sprite</em>-<em>sprite</em>.</td>
+</tr>
+<tr>
+<td align="center">53279</td>
+<td align="center">$D01F</td>
+<td align="center">-</td>
+<td>Registro de colisión <em>sprite</em>-fondo. Lectura de bits: <strong>Bits 0-7:</strong> <strong>1</strong> = El <em>sprite</em> 0-7 ha colisionado con el fondo. Escritura de bits: Activa la detección de las colisiones <em>sprite</em>-fondo.</td>
+</tr>
+<tr>
+<td align="center">53280</td>
+<td align="center">$D020</td>
+<td align="center">-</td>
+<td>Color del borde. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53281</td>
+<td align="center">$D021</td>
+<td align="center">-</td>
+<td>Color del fondo. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53282</td>
+<td align="center">$D022</td>
+<td align="center">-</td>
+<td>Color extra 1 del fondo. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53283</td>
+<td align="center">$D023</td>
+<td align="center">-</td>
+<td>Color extra 2 del fondo. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53284</td>
+<td align="center">$D024</td>
+<td align="center">-</td>
+<td>Color extra 3 del fondo. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53285</td>
+<td align="center">$D025</td>
+<td align="center">-</td>
+<td>Color extra 1 de <em>sprites</em>. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53286</td>
+<td align="center">$D026</td>
+<td align="center">-</td>
+<td>Color extra 2 de <em>sprites</em>. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53287</td>
+<td align="center">$D027</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 0. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53288</td>
+<td align="center">$D028</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 1. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53289</td>
+<td align="center">$D029</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 2. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53290</td>
+<td align="center">$D02A</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 3. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53291</td>
+<td align="center">$D02B</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 4. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53292</td>
+<td align="center">$D02C</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 5. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53293</td>
+<td align="center">$D02D</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 6. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53294</td>
+<td align="center">$D02E</td>
+<td align="center">-</td>
+<td>Color del <em>sprite</em> 7. <strong>Bits 0-3:</strong> 0-15.</td>
+</tr>
+<tr>
+<td align="center">53295-53311</td>
+<td align="center">$D02F-$D03F</td>
+<td align="center">-</td>
+<td>Sin uso (17 bytes).</td>
+</tr>
+<tr>
+<td align="center">53312-54271</td>
+<td align="center">$D040-$D3FF</td>
+<td align="center">-</td>
+<td>Duplicados del VIC-II (segmentos de 64 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="chip-sonoro-sid">Chip sonoro SID</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Modo L/E</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">54272-54273</td>
+<td align="center">$D400-$D401</td>
+<td align="center">Escritura</td>
+<td>Frecuencia de la voz 1 (<em>Frequency</em>).</td>
+</tr>
+<tr>
+<td align="center">54274-54275</td>
+<td align="center">$D402-$D403</td>
+<td align="center">Escritura</td>
+<td>Ancho de pulso de la voz 1 (<em>Pulse Width</em>).</td>
+</tr>
+<tr>
+<td align="center">54276</td>
+<td align="center">$D404</td>
+<td align="center">Escritura</td>
+<td>Registros de control de la voz 1:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Apagar voz (modo <em>Release</em>); <strong>1</strong> = Encender voz (modo <em>Attack-Decay-Sustain</em>).<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Activar sincronización.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Activar modulación de anillo (<em>Ring Modulator</em>).<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Desactivar voz, reiniciar generador de ruido (<em>Noise Generator</em>).<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Activar onda triangular (<em>Triangle</em>).<br>+ <strong>Bit 5:</strong> <strong>1</strong> = Activar onda en sierra (<em>Saw</em>).<br>+ <strong>Bit 6:</strong> <strong>1</strong> = Activar onda cuadrada (<em>Square</em>).<br>+ <strong>Bit 7:</strong> <strong>1</strong> = Activar ruido (<em>Noise</em>).</td>
+</tr>
+<tr>
+<td align="center">54277</td>
+<td align="center">$D405</td>
+<td align="center">Escritura</td>
+<td><em>Attack</em> y <em>Decay</em> de la voz 1:<br>+ <strong>Bits 0-3:</strong> Nivel de <em>Decay</em> (0-15).<br>+ <strong>Bits 4-7:</strong> Nivel de <em>Attack</em> (0-15).</td>
+</tr>
+<tr>
+<td align="center">54278</td>
+<td align="center">$D406</td>
+<td align="center">Escritura</td>
+<td><em>Sustain</em> y <em>Release</em> de la voz 1:<br>+ <strong>Bits 0-3:</strong> Nivel de <em>Release</em> (0-15).<br>+ <strong>Bits 4-7:</strong> Volumen de <em>Sustain</em> (0-15).</td>
+</tr>
+<tr>
+<td align="center">54279-54280</td>
+<td align="center">$D407-$D408</td>
+<td align="center">Escritura</td>
+<td>Frecuencia de la voz 2 (<em>Frequency</em>).</td>
+</tr>
+<tr>
+<td align="center">54281-54282</td>
+<td align="center">$D409-$D40A</td>
+<td align="center">Escritura</td>
+<td>Ancho de pulso de la voz 2 (<em>Pulse Width</em>).</td>
+</tr>
+<tr>
+<td align="center">54283</td>
+<td align="center">$D40B</td>
+<td align="center">Escritura</td>
+<td>Registros de control de la voz 2.</td>
+</tr>
+<tr>
+<td align="center">54284</td>
+<td align="center">$D40C</td>
+<td align="center">Escritura</td>
+<td><em>Attack</em> y <em>Decay</em> de la voz 2.</td>
+</tr>
+<tr>
+<td align="center">54285</td>
+<td align="center">$D40D</td>
+<td align="center">Escritura</td>
+<td><em>Sustain</em> y <em>Release</em> de la voz 2.</td>
+</tr>
+<tr>
+<td align="center">54286-54287</td>
+<td align="center">$D40E-$D40F</td>
+<td align="center">Escritura</td>
+<td>Frecuencia de la voz 3 (<em>Frequency</em>).</td>
+</tr>
+<tr>
+<td align="center">54288-54289</td>
+<td align="center">$D410-$D411</td>
+<td align="center">Escritura</td>
+<td>Ancho de pulso de la voz 3 (<em>Pulse Width</em>).</td>
+</tr>
+<tr>
+<td align="center">54290</td>
+<td align="center">$D412</td>
+<td align="center">Escritura</td>
+<td>Registros de control de la voz 3.</td>
+</tr>
+<tr>
+<td align="center">54291</td>
+<td align="center">$D413</td>
+<td align="center">Escritura</td>
+<td><em>Attack</em> y <em>Decay</em> de la voz 3.</td>
+</tr>
+<tr>
+<td align="center">54292</td>
+<td align="center">$D414</td>
+<td align="center">Escritura</td>
+<td><em>Sustain</em> y <em>Release</em> de la voz 3.</td>
+</tr>
+<tr>
+<td align="center">54293</td>
+<td align="center">$D415</td>
+<td align="center">Escritura</td>
+<td>Filtro de corte de frecuencias (<em>Cut Off</em>).<br><strong>Bits 0-2:</strong> Bits 0-2 del valor final.</td>
+</tr>
+<tr>
+<td align="center">54294</td>
+<td align="center">$D416</td>
+<td align="center">Escritura</td>
+<td>Filtro de corte de frecuencias (<em>Cut Off</em>).<br><strong>Bits 0-7:</strong> Bits 3-10 del valor final.</td>
+</tr>
+<tr>
+<td align="center">54295</td>
+<td align="center">$D417</td>
+<td align="center">Escritura</td>
+<td>Control del filtro:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Voz 1 filtrada.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Voz 2 filtrada.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Voz 3 filtrada.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Voz externa filtrada.<br>+ <strong>Bits 4-7:</strong> Resonancia del filtro (<em>Resonance</em>).</td>
+</tr>
+<tr>
+<td align="center">54296</td>
+<td align="center">$D418</td>
+<td align="center">Escritura</td>
+<td>Volumen y modos de filtrado:<br>+ <strong>Bits 0-3:</strong> Volumen.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Filtro de paso bajo activado (LPF).<br>+ <strong>Bit 5:</strong> <strong>1</strong> = Filtro de paso banda activado (BPF).<br>+ <strong>Bit 6:</strong> <strong>1</strong> = Filtro de paso alto activado (HPF).<br>+ <strong>Bit 7:</strong> Voz 3 desactivada.</td>
+</tr>
+<tr>
+<td align="center">54297</td>
+<td align="center">$D419</td>
+<td align="center">Lectura</td>
+<td>Valor X del paddle seleccionado en $DC00. (Se actualiza cada 512 ciclos.)</td>
+</tr>
+<tr>
+<td align="center">54298</td>
+<td align="center">$D41A</td>
+<td align="center">Lectura</td>
+<td>Valor Y del paddle seleccionado en $DC00. (Se actualiza cada 512 ciclos.)</td>
+</tr>
+<tr>
+<td align="center">54299</td>
+<td align="center">$D41B</td>
+<td align="center">Lectura</td>
+<td>Salida de onda de la voz 3.</td>
+</tr>
+<tr>
+<td align="center">54300</td>
+<td align="center">$D41C</td>
+<td align="center">Lectura</td>
+<td>Salida del ADSR de la voz 3.</td>
+</tr>
+<tr>
+<td align="center">54301-54303</td>
+<td align="center">$D41D-$D41F</td>
+<td align="center">-</td>
+<td>Sin uso (3 bytes).</td>
+</tr>
+<tr>
+<td align="center">54304-55295</td>
+<td align="center">$D420-$D7FF</td>
+<td align="center">-</td>
+<td>Duplicados del SID (segmentos de 32 bytes).</td>
+</tr>
+</tbody>
+</table><p>Tabla de valores para los niveles del ADSR:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">Nivel</th>
+<th align="center">Binario</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Attack</th>
+<th align="center">Decay</th>
+<th align="center">Release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">0</td>
+<td align="center">0000</td>
+<td align="center">0</td>
+<td align="center">2 ms</td>
+<td align="center">6 ms</td>
+<td align="center">6 ms</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">0001</td>
+<td align="center">1</td>
+<td align="center">8 ms</td>
+<td align="center">24 ms</td>
+<td align="center">24 ms</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">0010</td>
+<td align="center">2</td>
+<td align="center">16 ms</td>
+<td align="center">48 ms</td>
+<td align="center">48 ms</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">0011</td>
+<td align="center">3</td>
+<td align="center">24 ms</td>
+<td align="center">72 ms</td>
+<td align="center">72 ms</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">0100</td>
+<td align="center">4</td>
+<td align="center">38 ms</td>
+<td align="center">114 ms</td>
+<td align="center">114 ms</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">0101</td>
+<td align="center">5</td>
+<td align="center">56 ms</td>
+<td align="center">168 ms</td>
+<td align="center">168 ms</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">0110</td>
+<td align="center">6</td>
+<td align="center">68 ms</td>
+<td align="center">204 ms</td>
+<td align="center">204 ms</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="center">0111</td>
+<td align="center">7</td>
+<td align="center">80 ms</td>
+<td align="center">240 ms</td>
+<td align="center">240 ms</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">1000</td>
+<td align="center">8</td>
+<td align="center">100 ms</td>
+<td align="center">300 ms</td>
+<td align="center">300 ms</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="center">1001</td>
+<td align="center">9</td>
+<td align="center">250 ms</td>
+<td align="center">750 ms</td>
+<td align="center">750 ms</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="center">1010</td>
+<td align="center">A</td>
+<td align="center">500 ms</td>
+<td align="center">1.5 s</td>
+<td align="center">1.5 s</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="center">1011</td>
+<td align="center">B</td>
+<td align="center">800 ms</td>
+<td align="center">2.4 s</td>
+<td align="center">2.4 s</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="center">1100</td>
+<td align="center">C</td>
+<td align="center">1 s</td>
+<td align="center">3 s</td>
+<td align="center">3 s</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="center">1101</td>
+<td align="center">D</td>
+<td align="center">3 s</td>
+<td align="center">9 s</td>
+<td align="center">9 s</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="center">1110</td>
+<td align="center">E</td>
+<td align="center">5 s</td>
+<td align="center">15 s</td>
+<td align="center">15 s</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="center">1111</td>
+<td align="center">F</td>
+<td align="center">8 s</td>
+<td align="center">24 s</td>
+<td align="center">24 s</td>
+</tr>
+</tbody>
+</table><h2 id="buffer-de-color-de-pantalla">Buffer de color de pantalla</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">55296-56295</td>
+<td align="center">$D800-$DBE7</td>
+<td>Buffer de color de la pantalla (1000 bytes).<br><strong>Bits 0-3:</strong> Color del 0 al 15.</td>
+</tr>
+<tr>
+<td align="center">56296-56319</td>
+<td align="center">$DBE8-$DBFF</td>
+<td>Sin uso (24 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="cia1-entrada-datasette-irq">CIA1: Entrada, Datasette, IRQ</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">56320</td>
+<td align="center">$DC00</td>
+<td>Puerto A: Matriz de teclado y joystick 2. Lectura de bits:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Arriba del Joystick 2 pulsado.<br>+ <strong>Bit 1:</strong> <strong>0</strong> = Abajo del Joystick 2 pulsado.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Izquierda del Joystick 2 pulsado.<br>+ <strong>Bit 3:</strong> <strong>0</strong> = Derecha del Joystick 2 pulsado.<br>+ <strong>Bit 4:</strong> <strong>0</strong> = Disparo del Joystick 2 pulsado.<br>Escritura de bits:<br>+ <strong>Bit 0-7:</strong> <strong>0</strong> = Seleccionar que fila en la matriz del teclado leer.<br>+ <strong>Bit 6-7:</strong> <strong>01</strong> Paddle 1; <strong>10</strong> Paddle 2.</td>
+</tr>
+<tr>
+<td align="center">56321</td>
+<td align="center">$DC01</td>
+<td>Puerto B: Matriz de teclado y joystick 1. Lectura de bits:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Arriba del Joystick 1 pulsado.<br>+ <strong>Bit 1:</strong> <strong>0</strong> = Abajo del Joystick 1 pulsado.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Izquierda del Joystick 1 pulsado.<br>+ <strong>Bit 3:</strong> <strong>0</strong> = Derecha del Joystick 1 pulsado.<br>+ <strong>Bit 4:</strong> <strong>0</strong> = Disparo del Joystick 1 pulsado.<br>+ <strong>Bit 0-7:</strong> <strong>0</strong> = Tecla pulsada en la fila seleccionada de la matriz del teclado.</td>
+</tr>
+<tr>
+<td align="center">56322</td>
+<td align="center">$DC02</td>
+<td>Configuración del puerto A. <strong>Bits 0-7:</strong> <strong>0</strong> = Lectura; <strong>1</strong> = Escritura/Lectura.</td>
+</tr>
+<tr>
+<td align="center">56323</td>
+<td align="center">$DC03</td>
+<td>Configuración del puerto B. <strong>Bits 0-7:</strong> <strong>0</strong> = Lectura; <strong>1</strong> = Escritura/Lectura.</td>
+</tr>
+<tr>
+<td align="center">56324-56325</td>
+<td align="center">$DC04-$DC05</td>
+<td>Cuenta atrás A (<em>Timer</em>). Lectura: Valor actual. Escritura: Marca de tiempo inicial.</td>
+</tr>
+<tr>
+<td align="center">56326-56327</td>
+<td align="center">$DC06-$DC07</td>
+<td>Cuenta atrás B (<em>Timer</em>). Lectura: Valor actual. Escritura: Marca de tiempo inicial.</td>
+</tr>
+<tr>
+<td align="center">56328</td>
+<td align="center">$DC08</td>
+<td>TOD (Time Of Day; Hora del día): Décimas en formato BCD ($00-$09). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56329</td>
+<td align="center">$DC09</td>
+<td>TOD (Time Of Day; Hora del día): Segundos en formato BCD ($00-$59). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56330</td>
+<td align="center">$DC0A</td>
+<td>TOD (Time Of Day; Hora del día): Minutos en formato BCD ($00-$59). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56331</td>
+<td align="center">$DC0B</td>
+<td>TOD (Time Of Day; Hora del día): Horas en formato BCD (<strong>Bits 0-5:</strong> Horas; <strong>Bit 7:</strong> <strong>0</strong> = AM, <strong>1</strong> = PM). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56332</td>
+<td align="center">$DC0C</td>
+<td>Registro de cambios en serie (<em>serial shift</em>). (Los bits son leídos y escritos cada salto positivo del pin CNT.)</td>
+</tr>
+<tr>
+<td align="center">56333</td>
+<td align="center">$DC0D</td>
+<td>Registro de estado y control de interrupciones. Bits de lectura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Desbordamiento inferior en la cuenta atrás A.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Desbordamiento inferior en la cuenta atrás B.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = El TOD es igual a la hora de alarma.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Un byte completo se ha recibido o enviado desde el registro de cambios en serie (<em>serial shift</em>).<br>+ <strong>Bit 4:</strong> Nivel de señal en el pin FLAG, lectura del <em>datasette</em>.<br>+ <strong>Bit 7:</strong> Una interrupción ha sido generada.<br>Bits de escritura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Activar las interrupciones de desbordamiento inferior en la cuenta atrás A.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Activar las interrupciones de desbordamiento inferior en la cuenta atrás B.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Activar las interrupciones de la alarma.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Activar las interrupciones por recibir/enviar un byte completo en el registro de cambios en serie (<em>serial shift</em>).<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Activar las interrupciones por un salto positivo en el pin FLAG.<br>+ <strong>Bit 7:</strong> Bit de relleno. Cuando los bits 0-6 están a 1 toman el valor del bit 7, si están a 0 no son modificados.</td>
+</tr>
+<tr>
+<td align="center">56334</td>
+<td align="center">$DC0E</td>
+<td>Registro de control de la cuenta atrás A:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Parar; <strong>1</strong> = Iniciar.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Indicar desbordamiento inferior del temporizador en el bit 6 del puerto B.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Invertir el bit 6 del puerto B con el desbordamiento inferior; <strong>1</strong> = Generar con el desbordamiento inferior un salto positivo en el bit 6 del puerto B durante un ciclo de la CPU.<br>+ <strong>Bit 3:</strong> Acción de la cuenta atrás cuando hay un desbordamiento inferior. <strong>0</strong> = Reiniciar; <strong>1</strong> = Parar.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Carga el valor de inicio de la cuenta atrás.<br>+ <strong>Bit 5:</strong> Modo de la cuenta atrás. <strong>0</strong> = Ciclos de la CPU; <strong>1</strong> = Saltos positivos del pin CNT.<br>+ <strong>Bit 6:</strong> Configuración del registro de cambios en serie (<em>serial shift</em>). <strong>0</strong> = Lectura; <strong>1</strong> = Escritura.<br>+ <strong>Bit 7:</strong> Velocidad del TOD. <strong>0</strong> = 60 Hz; <strong>1</strong> = 50 Hz.</td>
+</tr>
+<tr>
+<td align="center">56335</td>
+<td align="center">$DC0F</td>
+<td>Registro de control de la cuenta atrás B:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Parar; <strong>1</strong> = Iniciar.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Indicar desbordamiento inferior del temporizador en el bit 7 del puerto B.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Invertir el bit 7 del puerto B con el desbordamiento inferior; <strong>1</strong> = Generar con el desbordamiento inferior un salto positivo en el bit 7 del puerto B durante un ciclo de la CPU.<br>+ <strong>Bit 3:</strong> Acción de la cuenta atrás cuando hay un desbordamiento inferior. <strong>0</strong> = Reiniciar; <strong>1</strong> = Parar.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Carga el valor de inicio de la cuenta atrás.<br>+ <strong>Bit 5-6:</strong> Acciones de la cuenta atrás. <strong>00</strong> = Contar ciclos de la CPU; <strong>01</strong> = Contar saltos positivos del pin CNT; <strong>10</strong> = Contar desbordamientos inferiores de la cuenta atrás A; <strong>11</strong> = Contar desbordamientos inferiores de la cuenta atrás A que ocurren cuando hay un salto positivo en el pin CNT.<br>+ <strong>Bit 7:</strong> Acción cuando se escribe el TOD. <strong>0</strong> = Configurar el TOD; <strong>1</strong> = Configurar la alarma.</td>
+</tr>
+<tr>
+<td align="center">56336-56575</td>
+<td align="center">$DC10-$DCFF</td>
+<td>Duplicados de la CIA1 (segmentos de 16 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="cia2-puerto-serie-rs-232-nmi">CIA2: Puerto Serie, RS-232, NMI</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">56576</td>
+<td align="center">$DD00</td>
+<td>Puerto A: Puerto Serie.<br> + <strong>Bits 0-1:</strong> Banco del VIC-II. <strong>00</strong> = Banco 3 $C000-$FFFF (49152-65535); <strong>01</strong> = Banco 2 $8000-$BFFF (32768-49151); <strong>10</strong> = Banco 1 $4000-$7FFF (16384-32767); <strong>11</strong> = Banco 0 $0000-$3FFF (0-16383).<br>+ <strong>Bit 2:</strong> TXD del RS-232 (bit de salida).<br>+ <strong>Bit 3:</strong> ATN OUT del Puerto Serie. <strong>0</strong> = Alto; <strong>1</strong> = Bajo.<br>+ <strong>Bit 4:</strong> CLOCK OUT del Puerto Serie. <strong>0</strong> = Alto; <strong>1</strong> = Bajo.<br>+ <strong>Bit 5:</strong> DATA OUT del Puerto Serie. <strong>0</strong> = Alto; <strong>1</strong> = Bajo.<br>+ <strong>Bit 6:</strong> CLOCK IN del Puerto Serie. <strong>0</strong> = Bajo; <strong>1</strong> = Alto.<br>+ <strong>Bit 7:</strong> DATA IN del Puerto Serie. <strong>0</strong> = Bajo; <strong>1</strong> = Alto.</td>
+</tr>
+<tr>
+<td align="center">56577</td>
+<td align="center">$DD01</td>
+<td>Puerto B: RS-232. Bits de lectura:<br>+ <strong>Bit 0:</strong> RXD del RS-232 (bit de entrada).<br>+ <strong>Bit 3:</strong> RI del RS-232.<br>+ <strong>Bit 4:</strong> DCD del RS-232.<br>+ <strong>Bit 5:</strong> Pin H del puerto de usuario.<br>+ <strong>Bit 6:</strong> CTS del RS-232. 1 = <em>Sender</em> preparado para enviar.<br>+ <strong>Bit 7:</strong> DSR del RS-232. 1 = <em>Receiver</em> preparado para recibir.<br>Bits de escritura:<br>+ <strong>Bit 1:</strong> RTS del RS-232. 1 = <em>Sender</em> preparado para enviar.<br>+ <strong>Bit 2:</strong> DTR del RS-232. 1 = <em>Receiver</em> preparado para recibir.<br>+ <strong>Bit 3:</strong> RI del RS-232.<br>+ <strong>Bit 4:</strong> DCD del RS-232.<br>+ <strong>Bit 5:</strong> Pin H del puerto de usuario.</td>
+</tr>
+<tr>
+<td align="center">56578</td>
+<td align="center">$DD02</td>
+<td>Configuración del puerto A. <strong>Bits 0-7:</strong> <strong>0</strong> = Lectura; <strong>1</strong> = Escritura/Lectura.</td>
+</tr>
+<tr>
+<td align="center">56579</td>
+<td align="center">$DD03</td>
+<td>Configuración del puerto B. <strong>Bits 0-7:</strong> <strong>0</strong> = Lectura; <strong>1</strong> = Escritura/Lectura.</td>
+</tr>
+<tr>
+<td align="center">56580-56581</td>
+<td align="center">$DD04-$DD05</td>
+<td>Cuenta atrás A (<em>Timer</em>). Lectura: Valor actual. Escritura: Marca de tiempo inicial.</td>
+</tr>
+<tr>
+<td align="center">56582-56583</td>
+<td align="center">$DD06-$DD07</td>
+<td>Cuenta atrás B (<em>Timer</em>). Lectura: Valor actual. Escritura: Marca de tiempo inicial.</td>
+</tr>
+<tr>
+<td align="center">56584</td>
+<td align="center">$DD08</td>
+<td>TOD (Time Of Day; Hora del día): Décimas en formato BCD ($00-$09). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56585</td>
+<td align="center">$DD09</td>
+<td>TOD (Time Of Day; Hora del día): Segundos en formato BCD ($00-$59). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56586</td>
+<td align="center">$DD0A</td>
+<td>TOD (Time Of Day; Hora del día): Minutos en formato BCD ($00-$59). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56587</td>
+<td align="center">$DD0B</td>
+<td>TOD (Time Of Day; Hora del día): Horas en formato BCD (<strong>Bits 0-5:</strong> Horas; <strong>Bit 7:</strong> <strong>0</strong> = AM, <strong>1</strong> = PM). Lectura: Valor actual. Escritura: Configurar TOD o alarma.</td>
+</tr>
+<tr>
+<td align="center">56588</td>
+<td align="center">$DD0C</td>
+<td>Registro de cambios en serie (<em>serial shift</em>). (Los bits son leídos y escritos cada salto positivo del pin CNT.)</td>
+</tr>
+<tr>
+<td align="center">56589</td>
+<td align="center">$DD0D</td>
+<td>Registro de estado y control de interrupciones. Bits de lectura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Desbordamiento inferior en la cuenta atrás A.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Desbordamiento inferior en la cuenta atrás B.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = El TOD es igual a la hora de alarma.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Un byte completo se ha recibido o enviado desde el registro de cambios en serie (<em>serial shift</em>).<br>+ <strong>Bit 4:</strong> Nivel de señal en el pin FLAG.<br>+ <strong>Bit 7:</strong> Una interrupción no-enmascarable ha sido generada.<br>Bits de escritura:<br>+ <strong>Bit 0:</strong> <strong>1</strong> = Activar las interrupciones no-enmascarables de desbordamiento inferior en la cuenta atrás A.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Activar las interrupciones no-enmascarables de desbordamiento inferior en la cuenta atrás B.<br>+ <strong>Bit 2:</strong> <strong>1</strong> = Activar las interrupciones no-enmascarables de la alarma.<br>+ <strong>Bit 3:</strong> <strong>1</strong> = Activar las interrupciones no-enmascarables por recibir/enviar un byte completo en el registro de cambios en serie (<em>serial shift</em>).<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Activar las interrupciones no-enmascarables por un salto positivo en el pin FLAG.<br>+ <strong>Bit 7:</strong> Bit de relleno. Cuando los bits 0-6 están a 1 toman el valor del bit 7, si están a 0 no son modificados.</td>
+</tr>
+<tr>
+<td align="center">56590</td>
+<td align="center">$DD0E</td>
+<td>Registro de control de la cuenta atrás A:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Parar; <strong>1</strong> = Iniciar.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Indica desbordamiento inferior del temporizador en el bit 6 del puerto B.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Invertir el bit 6 del puerto B con el desbordamiento inferior; <strong>1</strong> = Generar con el desbordamiento inferior un salto positivo en el bit 6 del puerto B durante un ciclo de la CPU.<br>+ <strong>Bit 3:</strong> Acción de la cuenta atrás cuando hay un desbordamiento inferior. <strong>0</strong> = Reiniciar; <strong>1</strong> = Parar.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Carga el valor de inicio de la cuenta atrás.<br>+ <strong>Bit 5:</strong> Modo de la cuenta atrás. <strong>0</strong> = Ciclos de la CPU; <strong>1</strong> = Saltos positivos del pin CNT.<br>+ <strong>Bit 6:</strong> Configuración del registro de cambios en serie (<em>serial shift</em>). <strong>0</strong> = Lectura; <strong>1</strong> = Escritura.<br>+ <strong>Bit 7:</strong> Velocidad del TOD. <strong>0</strong> = 60 Hz; <strong>1</strong> = 50 Hz.</td>
+</tr>
+<tr>
+<td align="center">56591</td>
+<td align="center">$DD0F</td>
+<td>Registro de control de la cuenta atrás B:<br>+ <strong>Bit 0:</strong> <strong>0</strong> = Parar; <strong>1</strong> = Iniciar.<br>+ <strong>Bit 1:</strong> <strong>1</strong> = Indica desbordamiento inferior del temporizador en el bit 7 del puerto B.<br>+ <strong>Bit 2:</strong> <strong>0</strong> = Invertir el bit 7 del puerto B con el desbordamiento inferior; <strong>1</strong> = Generar con el desbordamiento inferior un salto positivo en el bit 7 del puerto B durante un ciclo de la CPU.<br>+ <strong>Bit 3:</strong> Acción de la cuenta atrás cuando hay un desbordamiento inferior. <strong>0</strong> = Reiniciar; <strong>1</strong> = Parar.<br>+ <strong>Bit 4:</strong> <strong>1</strong> = Carga el valor de inicio de la cuenta atrás.<br>+ <strong>Bit 5-6:</strong> Acciones de la cuenta atrás. <strong>00</strong> = Contar ciclos de la CPU; <strong>01</strong> = Contar saltos positivos del pin CNT; <strong>10</strong> = Contar desbordamientos inferiores de la cuenta atrás A; <strong>11</strong> = Contar desbordamientos inferiores de la cuenta atrás A que ocurren cuando hay un salto positivo en el pin CNT.<br>+ <strong>Bit 7:</strong> Acción cuando se escribe el TOD. <strong>0</strong> = Configurar el TOD; <strong>1</strong> = Configurar la alarma.</td>
+</tr>
+<tr>
+<td align="center">56592-56831</td>
+<td align="center">$DD10-$DDFF</td>
+<td>Duplicados de la CIA2 (segmentos de 16 bytes).</td>
+</tr>
+</tbody>
+</table><h2 id="bloques-finales-de-memoria">Bloques finales de memoria</h2>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dirección</th>
+<th align="center">Hexadecimal</th>
+<th align="center">Defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">56832-57087</td>
+<td align="center">$DE00-$DEFF</td>
+<td align="center">-</td>
+<td>Área E/S Nº 1 (256 bytes): Registros y/o subrutinas de dispositivos externos opcionales.</td>
+</tr>
+<tr>
+<td align="center">57088-57343</td>
+<td align="center">$DF00-$DFFF</td>
+<td align="center">-</td>
+<td>Área E/S Nº 2 (256 bytes): Registros y/o subrutinas de dispositivos externos opcionales.</td>
+</tr>
+<tr>
+<td align="center">57344-65535</td>
+<td align="center">$E000-$FFFF</td>
+<td align="center">-</td>
+<td>ROM del KERNAL.</td>
+</tr>
+<tr>
+<td align="center">65530-65531</td>
+<td align="center">$FFFA-$FFFB</td>
+<td align="center">$FE43</td>
+<td>Puntero a la rutina de servicio de interrupciones no-enmascarables.</td>
+</tr>
+<tr>
+<td align="center">65532-65533</td>
+<td align="center">$FFFC-$FFFD</td>
+<td align="center">$FCE2</td>
+<td>Puntero al reinicio frío.</td>
+</tr>
+<tr>
+<td align="center">65534-65535</td>
+<td align="center">$FFFE-$FFFF</td>
+<td align="center">$FF48</td>
+<td>Puntero a la rutina de servicio de interrupciones.</td>
+</tr>
+</tbody>
+</table>
+    </div>
+  </div>
+</body>
+
+</html>

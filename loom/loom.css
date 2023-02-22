@@ -1,0 +1,53 @@
+/* * * * * * * * * * * * * * * * * * * *\
+ *                                     *
+ * Colores:                            *
+ *                                     *
+ *    c rgb(128, 0, 0)                 *
+ *    d rgb(255, 100, 100)             *
+ *    e rgb(255, 255, 0)               *
+ *    f rgb(0, 255, 0)                 *
+ *    g rgb(0, 255, 255)               *
+ *    a rgb(0, 148, 148)               *
+ *    b rgb(0, 0, 128)                 *
+ *    C rgb(255, 255, 255)             *
+ *                                     *
+\* * * * * * * * * * * * * * * * * * * */
+
+
+/* Enlaces */
+A.notac  {color : rgb(128, 0, 0);     text-decoration : none}
+A.notad  {color : rgb(255, 100, 100); text-decoration : none}
+A.notae  {color : rgb(255, 255, 0);   text-decoration : none}
+A.notaf  {color : rgb(0, 255, 0);     text-decoration : none}
+A.notag  {color : rgb(0, 255, 255);   text-decoration : none}
+A.notaa  {color : rgb(0, 148, 148);   text-decoration : none}
+A.notab  {color : rgb(0, 0, 128);     text-decoration : none}
+A.notac2 {color : rgb(255, 255, 255); text-decoration : none}
+A.normal {color : rgb(168, 204, 240); text-decoration : none}
+A:hover  {color : rgb(168, 204, 240); text-decoration : underline}
+
+
+/* Cuerpo */
+BODY {background-color : #000000; color : rgb(168, 204, 240);
+      text-align : center/*; background-image : url("img/varios/fondo.gif")*/}
+
+/* Otros */
+
+P.iz {text-align : left}
+P.de {text-align : right}
+
+UL.iz {text-align : left}
+UL.de {text-align : right}
+
+/* Estilos para las tablas */
+TABLE {background-color : #000000}
+TD {vertical-align : middle; text-align : center}
+TD.titulo {background-color : #333366; height : 32}
+TD.enlace {background-color : #336699; height : 16}
+TD.cabece {background-color : #333366; height : 32;
+           font-size : 28}
+TD.subtit {background-color : #336699; height : 24;
+           font-size : 20}
+TD.desc   {text-align : left; width : 80%}
+TD.var    {vertical-align : top; text-align : right;
+           height : 18; witdh : 18}
