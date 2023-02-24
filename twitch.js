@@ -1383,7 +1383,7 @@ let LibraryOfGames = [
     { name: "Warhammer 40,000: Dawn of War - Winter Assault", finished: "No", played: "No" },
     { name: "Warhammer 40,000: Dawn of War", finished: "No", played: "No" },
     { name: "Warhammer 40,000: Rites of War", finished: "No", played: "No" },
-    { name: "Warhammer 40,000: Space Marine", finished: "Sí", played: "(Sí)" },
+    { name: "Warhammer 40,000: Space Marine", finished: "Sí", played: "Sí" },
     { name: "Warhammer: Vermintide 2", finished: "No", played: "No" },
     { name: "WARP", finished: "Sí", played: "No" },
     { name: "WARSAW", finished: "No", played: "No" },
